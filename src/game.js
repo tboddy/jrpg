@@ -1,6 +1,6 @@
 let gameLoopInterval, isGameOver = false, gameClock = 0;
 
-const initGame = function(){
+const initGame = () => {
 	$(window).resize(resizeGame);
 	loop = gameLoop;
 	battle.controls();
@@ -8,7 +8,7 @@ const initGame = function(){
 	window.requestAnimationFrame(loop);
 },
 
-gameLoop = function(){
+gameLoop = () => {
 	clearGame();
 	battle.loop();
 	gameClock++;

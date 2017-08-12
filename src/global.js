@@ -99,7 +99,7 @@ drawChar = (input, x, y, isRed, isDisabled) => {
 	context.drawImage(charImg, charLeft, charTop, size, size, x, y, size, size);
 }, 
 
-getAspect = function(){
+getAspect = () => {
 	var newWidth = $(window).width(), newHeight = $(window).height(), remHeight = $(window).width() * 0.9375,
 		remWidth = $(window).height() * 1.066666666667;
 	if(newWidth >= remWidth) newWidth = remWidth;
