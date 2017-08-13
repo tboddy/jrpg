@@ -34,7 +34,8 @@ actionHallImg.src = 'img/battle-hall.png';
 menuBgImg.src = 'img/menu-bg.png';
 enemySelectImg.src = 'img/select-arrow.png';
 
-let currentMenu = actionsData, currentMenuType, currentAction = false, selectingEnemy = false, attackingEnemy = false;
+let currentMenu = actionsData, currentMenuType, currentAction = false, selectingEnemy = false, attackingEnemy = false,
+	selectingPartyMember = false;
 
 const currentEnemiesData = [
 	bestiary.enemies.archer(),
@@ -146,6 +147,11 @@ const battle = {
 					currentEnemiesData.splice(currentEnemy().index, 1);
 					if(currentEnemiesData.length) currentEnemiesData[0].selected = true;
 					attackingEnemy = false;
+				} else if(selectingPartyMember){
+					console.log(selectingPartyMember);
+					nextTurn();
+					// switch(selectingPartyMember){
+					// }
 				}
 				switch(lastSkill){
 					case 'attack': nextTurn(); break;
@@ -165,6 +171,7 @@ const battle = {
 			else if(currentMenuType && currentMenuType == 'items') doItem();
 		}, back = () => {
 			if(selectingEnemy) selectingEnemy = false;
+			if(selectingPartyMember) selectingPartyMember = false;
 			if(currentMenu != actionsData && !currentAction){
 				currentMenu.forEach((item, i) => {
 					item.y = false;
@@ -326,7 +333,8 @@ const battle = {
 				}, info = () => {
 					let infoString = '';
 					if(currentAction && (currentAction.type == 'selectItem')){
-						infoString = 'select a party member'
+						infoString = 'select a party member';
+						selectingPartyMember = true;
 					} else {
 						currentMenu.forEach(item => {
 							if(item.active && item.info) infoString = item.info;
