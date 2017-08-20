@@ -26,6 +26,8 @@ const colors = {
 
 jrpg = {},
 
+circle = Math.PI * 2,
+
 resizeGame = () => {
 	var canvasWidth = getAspect().width, canvasHeight = getAspect().height;
 	canvasEl.css('width', canvasWidth + 'px').css('height', canvasHeight + 'px').css('margin-left', -(canvasWidth / 2) + 'px').css('margin-top', -(canvasHeight / 2) + 'px');

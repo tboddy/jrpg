@@ -7,6 +7,7 @@ module.exports = function(grunt) {
 					'src/global.js',
 					'src/game.js',
 					'src/party.js',
+					'src/dungeon.js',
 					'src/battle.js'
 				],
 				dest: 'game.js'
