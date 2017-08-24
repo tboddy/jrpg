@@ -1,4 +1,4 @@
-const fps = 60, canvas = document.getElementById('canvas'), canvasEl = $('canvas'), grid = 16, gameHeight = 240, gameWidth = 256,
+const fps = 60, canvas = document.getElementById('canvas'), canvasEl = $('canvas'), grid = 16, gameHeight = 224, gameWidth = 256,
 	browserWindow = require('electron').remote, storage = require('electron-json-storage'), analogThresh = 0.15, charImg = new Image();
 const context = canvas.getContext('2d'), mainWindow = browserWindow.getCurrentWindow();
 let gamepad = false, savedData = {}, startedGame = false, isFullscreen = false, loop, canGetHit = true;
@@ -103,7 +103,7 @@ drawChar = (input, x, y, isRed, isDisabled) => {
 
 getAspect = () => {
 	var newWidth = $(window).width(), newHeight = $(window).height(), remHeight = $(window).width() * 0.9375,
-		remWidth = $(window).height() * 1.066666666667;
+		remWidth = $(window).height() * 1.14285714286;
 	if(newWidth >= remWidth) newWidth = remWidth;
 	else if(newHeight > remHeight) newHeight = remHeight;
 	return {width: newWidth, height: newHeight};
