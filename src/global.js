@@ -6,11 +6,11 @@ let gamepad = false, savedData = {}, startedGame = false, isFullscreen = false, 
 charImg.src = 'img/font.png';
 
 const colors = {
-	medium: '#8b8b8b',
-	dark: '#6b6b6b',
-	darker: '#4b4b4b',
-	darkest: '#2f2f2f',
-	purple: '#744253',
+	// medium: '#8b8b8b',
+	// dark: '#6b6b6b',
+	// darker: '#4b4b4b',
+	// darkest: '#2f2f2f',
+	// purple: '#744253',
 
 
 
@@ -21,7 +21,11 @@ const colors = {
 	purpleDarker: '#222034',
 	purpleDark: '#45283c',
 	purple: '#76428a',
-	blueLight: '#5fcde4'
+	blueLight: '#5fcde4',
+	mauve: '#663931',
+	ochre: '#524b24',
+	greenDark: '#4b692f',
+	cerulean: '#306082'
 },
 
 jrpg = {},
