@@ -258,7 +258,7 @@ let map = [
 
 // map = map.reverse()
 
-let time = Date.now(), oldTime = Date.now(), controlClock = 0;
+const rotateSpeed = 90 / 500;
 
 const dungeon = {
 
@@ -268,7 +268,7 @@ const dungeon = {
 			let canMove = true;
 			const keysDown = e => {
 				if(canMove){
-					canMove = false;
+					// canMove = false;
 					switch(e.which){
 						case 38: forward(); break;
 						case 37: turnLeft(); break;
@@ -282,14 +282,28 @@ const dungeon = {
 			}, forward = () => {
 				if(direction.x == 0.5 && direction.y == 0){ // go east
 					if(map[position.y][position.x + 1] == '.') position.x = position.x + 1;
-				} else if(direction.x = 0.5 && direction.y == 0){ // go west
-					if(map[position.y][position.x - 1] == '.') position.x = position.x - 1;
 				}
+				// else if(direction.x = -0.5 && direction.y == 0){ // go west
+				// 	if(map[position.y][position.x - 1] == '.') position.x = position.x - 1;
+				// }
 			}, turnAround = () => {
-				if(direction.x == 0.5 && direction.y == 0) direction.x = -0.5; // from east to west
-				else if(direction.x == -0.5 && direction.y == 0) direction.x = 0.5; // from west to east
-			}, turnLeft = () => {
+
 			}, turnRight = () => {
+
+				const oldDirX = direction.x, oldPlaneX = plane.x;
+				direction.x = direction.x * Math.cos(rotateSpeed) - direction.y * Math.sin(rotateSpeed);
+				direction.y = oldDirX * Math.sin(rotateSpeed) + direction.y * Math.cos(rotateSpeed);
+	      plane.x = plane.x * Math.cos(rotateSpeed) - plane.y * Math.sin(rotateSpeed);
+	      plane.y = oldPlaneX * Math.sin(rotateSpeed) + plane.y * Math.cos(rotateSpeed);
+
+			}, turnLeft = () => {
+
+				const oldDirX = direction.x, oldPlaneX = plane.x;
+				direction.x = direction.x * Math.cos(-rotateSpeed) - direction.y * Math.sin(-rotateSpeed);
+				direction.y = oldDirX * Math.sin(-rotateSpeed) + direction.y * Math.cos(-rotateSpeed);
+	      plane.x = plane.x * Math.cos(-rotateSpeed) - plane.y * Math.sin(-rotateSpeed);
+	      plane.y = oldPlaneX * Math.sin(-rotateSpeed) + plane.y * Math.cos(-rotateSpeed);
+
 			};
 			document.addEventListener('keydown', keysDown);
 			document.addEventListener('keyup', keysUp);
