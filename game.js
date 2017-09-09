@@ -63,8 +63,11 @@ const colors = {
 	blueLight: '#5fcde4',
 	mauve: '#663931',
 	ochre: '#524b24',
+	green: '#6abe30',
 	greenDark: '#4b692f',
-	cerulean: '#306082'
+	cerulean: '#306082',
+	red: '#ac3232',
+	redLight: '#d95763'
 },
 
 jrpg = {},
@@ -308,15 +311,16 @@ const dungeon = {
 						drawRect(0, 0, gameWidth, rayHeight / 2, colors.black);
 					}, floor = () => {
 
+						const floorColor = colors.greenDark, shadowColor = colors.ochre;
 
-						drawRect(0, rayHeight / 2, gameWidth, rayHeight / 2, colors.ochre);
+						drawRect(0, rayHeight / 2, gameWidth, rayHeight / 2, floorColor);
 
 						for(i = rayHeight / 2; i < rayHeight; i++){
 							const diff = rayHeight - i - 1;
 							if(diff > 0){
 								context.save();
-								context.globalAlpha = diff / 300;
-								drawRect(0, i + 1, gameWidth, 1, 'black');
+								context.globalAlpha = diff / 75;
+								drawRect(0, i + 1, gameWidth, 1, shadowColor);
 								context.restore();
 							}
 						}
@@ -365,15 +369,21 @@ const dungeon = {
 					if(drawStart < 0) drawStart = 0;
 					if(drawEnd >= rayHeight) drawEnd = rayHeight - 1;
 
-					let wallColor = 'pink';
+					let wallColor = 'pink', shadowColor = 'black';
 					switch(map[mapPosition.y][mapPosition.x]){
-						case '1': wallColor = colors.greenDark; break;
-						case '2': wallColor = colors.mauve; break;
+						case '1':
+							wallColor = colors.green;
+							shadowColor = colors.greenDark;
+							break;
+						case '2':
+							wallColor = colors.redLight;
+							shadowColor = colors.red;
+							break;
 					}
 					drawRect(column, drawStart, 1, lineHeight, wallColor);
 					context.save();
-					context.globalAlpha = (rayHeight - lineHeight) / 350;
-					drawRect(column, drawStart, 1, lineHeight, 'black');
+					context.globalAlpha = (rayHeight - lineHeight) / 150;
+					drawRect(column, drawStart, 1, lineHeight, shadowColor);
 					context.restore();
 
 				};
@@ -386,9 +396,9 @@ const dungeon = {
 			},
 
 			chrome = () => {
-				drawRect(1, rayHeight + 1, gameWidth - 2, gameHeight - rayHeight - 2, colors.purpleDarker); // bg
-				drawRect(1, rayHeight + 1, gameWidth - 2, 1, colors.purpleDark); // top bevel
-				drawRect(grid * 6, rayHeight + 1, 1, gameHeight - rayHeight - 2, 'black'); // center border
+				drawRect(0, rayHeight + 1, gameWidth, gameHeight - rayHeight - 1, colors.purpleDarker); // bg
+				drawRect(0, rayHeight + 1, gameWidth, 1, colors.purpleDark); // top bevel
+				drawRect(grid * 6, rayHeight + 1, 1, gameHeight - rayHeight - 1, 'black'); // center border
 
 			};
 

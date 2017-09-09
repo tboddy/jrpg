@@ -24,8 +24,11 @@ const colors = {
 	blueLight: '#5fcde4',
 	mauve: '#663931',
 	ochre: '#524b24',
+	green: '#6abe30',
 	greenDark: '#4b692f',
-	cerulean: '#306082'
+	cerulean: '#306082',
+	red: '#ac3232',
+	redLight: '#d95763'
 },
 
 jrpg = {},
