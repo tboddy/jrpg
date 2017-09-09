@@ -304,8 +304,26 @@ const dungeon = {
 				let column = 0;
 
 				const background = () => {
-					drawRect(0, 0, gameWidth, rayHeight / 2, colors.black); // ceiling
-					drawRect(0, rayHeight / 2, gameWidth, rayHeight / 2, colors.ochre); // floor
+					const ceiling = () => {
+						drawRect(0, 0, gameWidth, rayHeight / 2, colors.black);
+					}, floor = () => {
+
+
+						drawRect(0, rayHeight / 2, gameWidth, rayHeight / 2, colors.ochre);
+
+						for(i = rayHeight / 2; i < rayHeight; i++){
+							const diff = rayHeight - i - 1;
+							if(diff > 0){
+								context.save();
+								context.globalAlpha = diff / 300;
+								drawRect(0, i + 1, gameWidth, 1, 'black');
+								context.restore();
+							}
+						}
+
+					};
+					ceiling();
+					floor();
 				}, wall = () => {
 					const cameraX = 2 * column / rayWidth - 1, rayPosition = {x: position.x, y: position.y}, sideDist = {x: 0, y: 0}, step = {x: 0, y: 0};
 						rayDirection = {x: direction.x + plane.x * cameraX, y: direction.y + plane.y * cameraX};
@@ -352,8 +370,11 @@ const dungeon = {
 						case '1': wallColor = colors.greenDark; break;
 						case '2': wallColor = colors.mauve; break;
 					}
-
 					drawRect(column, drawStart, 1, lineHeight, wallColor);
+					context.save();
+					context.globalAlpha = (rayHeight - lineHeight) / 350;
+					drawRect(column, drawStart, 1, lineHeight, 'black');
+					context.restore();
 
 				};
 
