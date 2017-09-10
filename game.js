@@ -70,6 +70,18 @@ const colors = {
 	redLight: '#d95763'
 },
 
+colorsNew = {
+	grayDark: '#4e4a4e',
+	gray: '#8595a1',
+	greenDark: '#346524',
+	green: '#6daa2c',
+	brownDark: '#442434',
+	brown: '#854c30',
+	blueDark: '#30346d',
+	blue: '#597dce',
+	red: '#d04648'
+},
+
 jrpg = {},
 
 circle = Math.PI * 2,
@@ -222,55 +234,64 @@ const inventoryData = [
 	}
 
 ];
-const position = {x: 2, y: 2}, 
+const position = {x: 3, y: 3}, 
 	direction = {x: 0.5, y: 0},
-	plane = {x: 0, y: 1},
-	rayHeight = gameHeight - grid * 5,
-	rayWidth = gameWidth + grid * 2,
-	treeWallImage = new Image();
+	plane = {x: 0, y: 0.8},
+	rayHeight = gameHeight - grid * 6,
+	rayWidth = gameWidth,
+	treeWallImage = new Image(),
+	bricks1WallImage = new Image(),
+	door1Image = new Image();
 
 treeWallImage.src = 'img/trees.png';
+bricks1WallImage.src = 'img/bricks1.png';
+door1Image.src = 'img/door1.png';
+
+const bricks1WallImageHeight = grid, bricks1WallImageWidth = grid;
 
 let map = [
-	['1','1','1','1','1','1','1','1','1','1','1','1'],
-
-	['1','.','.','.','.','.','.','.','.','.','.','1'],
-
-	['1','.','.','.','.','.','.','.','.','.','.','1'],
-
-	['1','.','.','2','2','1','1','.','.','2','2','1'],
-
-	['1','.','.','2','2','1','1','.','.','2','2','1'],
-
-	['1','.','.','.','.','2','2','.','.','1','1','1'],
-
-	['1','.','.','.','.','2','2','.','.','1','1','1'],
-
-	['1','.','.','.','.','.','.','.','.','.','.','1'],
-
-	['1','.','.','.','.','.','.','.','.','.','.','1'],
-
-	['1','1','1','1','1','1','1','1','1','1','1','1']
+	['1','1','1','1','1','1','1','1'],
+	['1','.','.','.','.','.','.','1'],
+	['1','.','.','1','2','1','.','1'],
+	['1','.','1','1','1','1','1','1'],
+	['1','.','1','1','1','1','1','1'],
+	['1','.','.','.','.','.','.','1'],
+	['1','.','.','.','.','.','.','1'],
+	['1','1','1','1','1','1','1','1']
 ];
 
 const moveTime = 8;
 
-const rotateSpeed = (Math.PI / moveTime) / 2;
+const rotateSpeed = (Math.PI / moveTime) / 2, randomEncounterSteps = 12;
 
-let turnRightTimer = moveTime, turnLeftTimer = moveTime, moveForwardTimer = moveTime, turnAroundTimer = moveTime * 2;
+let turnRightTimer = moveTime, turnLeftTimer = moveTime, moveForwardTimer = moveTime, turnAroundTimer = moveTime * 2,
+	currentSteps = 0, inBattle = false;
 
-// map.forEach((row, i) => {
-// 	console.log(row)
-// });
-
-// map = map.reverse()
-
+const partyMembers = [
+	{
+		name: 'boddy'
+	}, {
+		name: 'bala'
+	}, {
+		name: 'kilo'
+	}
+];
 
 const dungeon = {
 
 	setup(){
 
-		const controls = () => {
+		const parseMap = () => {
+			console.log('map is ' + map[0].length + 'x' + map.length);
+			map.forEach((row, i) => {
+				map[i] = row.reduce((res, current, index, array) => {
+					return res.concat([current, current]);
+				}, []);
+			});
+			map = map.reduce((res, current, index, array) => {
+				return res.concat([current, current]);
+			}, []);
+		}, controls = () => {
 			let canMove = true;
 			const keysDown = e => {
 				if(canMove){
@@ -288,6 +309,12 @@ const dungeon = {
 				canMove = true;
 			}, forward = () => {
 				moveForwardTimer = 0;
+				currentSteps++;
+				if(currentSteps == randomEncounterSteps){
+					inBattle = true;
+					currentSteps = 0;
+					// alert('In battle lol.')
+				}
 			}, turnAround = () => { turnAroundTimer = 0;
 			}, turnRight = () => { turnRightTimer = 0;
 			}, turnLeft = () => { turnLeftTimer = 0;
@@ -296,6 +323,7 @@ const dungeon = {
 			document.addEventListener('keyup', keysUp);
 		};
 
+		parseMap();
 		controls();
 
 	},
@@ -309,23 +337,26 @@ const dungeon = {
 
 				const background = () => {
 					const ceiling = () => {
-						drawRect(0, 0, gameWidth, rayHeight / 2, colors.black);
+						const ceilingColor = colorsNew.gray, shadowColor = colorsNew.grayDark;
+						drawRect(0, 0, gameWidth, rayHeight / 2, ceilingColor);
+						for(i = 0; i < rayHeight / 2; i++){
+							context.save();
+							context.globalAlpha = i / 75;
+							drawRect(0, i, gameWidth, 1, shadowColor);
+							context.restore();
+						}
 					}, floor = () => {
-
-						const floorColor = colors.ochre;
-
+						const floorColor = colorsNew.brown, shadowColor = colorsNew.brownDark;
 						drawRect(0, rayHeight / 2, gameWidth, rayHeight / 2, floorColor);
-
 						for(i = rayHeight / 2; i < rayHeight; i++){
 							const diff = rayHeight - i - 1;
 							if(diff > 0){
 								context.save();
-								context.globalAlpha = diff / 125;
-								drawRect(0, i + 1, gameWidth, 1, 'black');
+								context.globalAlpha = diff / 75;
+								drawRect(0, i + 1, gameWidth, 1, shadowColor);
 								context.restore();
 							}
 						}
-
 					};
 					ceiling();
 					floor();
@@ -366,27 +397,24 @@ const dungeon = {
 					perpWallDist = side == 0 ? (mapPosition.x - rayPosition.x + (1 - step.x) / 2) / rayDirection.x :
 						(mapPosition.y - rayPosition.y + (1 - step.y) / 2) / rayDirection.y;
 					const lineHeight = rayHeight / perpWallDist;
-					let drawStart = -lineHeight / 2 + rayHeight / 2, drawEnd = lineHeight / 2 + rayHeight / 2;
+					let drawStart = -lineHeight / 2 + rayHeight / 2;
 					if(drawStart < 0) drawStart = 0;
-					if(drawEnd >= rayHeight) drawEnd = rayHeight - 1;
 
-					let wallTexture = treeWallImage;
+					let wallTexture = treeWallImage, textureHeight = grid * 4;
 					switch(map[mapPosition.y][mapPosition.x]){
 						case '1':
-							wallTexture = treeWallImage
+							wallTexture = bricks1WallImage;
 							break;
 						case '2':
-							wallColor = colors.redLight;
+							wallTexture = door1Image;
 							break;
 					}
 
-					// drawRect(column, drawStart, 1, lineHeight, wallColor);
-					// columnTextureCount += column;
-					context.drawImage(treeWallImage, columnTextureCount, 0, 1, 160, column - grid, drawStart, 1, lineHeight);
+					context.drawImage(wallTexture, columnTextureCount, 0, 1, textureHeight, column, drawStart, 1, lineHeight);
 
 					context.save();
 					context.globalAlpha = (rayHeight - lineHeight) / 250;
-					drawRect(column - grid, drawStart, 1, lineHeight, 'black');
+					drawRect(column, drawStart, 1, lineHeight, 'black');
 					context.restore();
 
 				};
@@ -396,14 +424,39 @@ const dungeon = {
 					wall();
 					column++;
 					columnTextureCount++;
-					if(columnTextureCount >= 120) columnTextureCount = 0;
+					if(columnTextureCount >= grid * 4) columnTextureCount = 0;
 				}
 			},
 
 			chrome = () => {
-				drawRect(0, rayHeight + 1, gameWidth, gameHeight - rayHeight - 1, colors.purpleDarker); // bg
-				drawRect(0, rayHeight + 1, gameWidth, 1, colors.purpleDark); // top bevel
-				drawRect(grid * 6, rayHeight + 1, 1, gameHeight - rayHeight - 1, 'black'); // center border
+
+
+				const bgColor = colorsNew.grayDark, bevelColor = colorsNew.gray;
+				drawRect(0, rayHeight + 1, gameWidth, gameHeight - rayHeight - 1, bgColor); // bg
+				drawRect(0, rayHeight + 1, gameWidth, 1, bevelColor); // bevel
+
+				// const info = () => {
+				// 	drawRect(0, rayHeight + 1, gameWidth, 1, bevelColor);
+				// 	drawRect(0, rayHeight + 1 + grid, gameWidth, 1, 'black');
+				// 	// drawString('dungeon crawlin...', grid / 2, rayHeight + 6);
+				// }, party = () => {
+
+				// 	const partyMember = (member, i) => {
+				// 		drawString(member.name, grid / 4, rayHeight + 6 + grid * (i + 1));
+				// 	};
+
+				// 	drawRect(0, rayHeight + 2 + grid, grid * 6, 1, bevelColor);
+				// 	drawRect(0, rayHeight + 1 + grid * 2, grid * 6, 1, 'black');
+				// 	drawRect(0, rayHeight + 2 + grid * 2, grid * 6, 1, bevelColor);
+				// 	drawRect(0, rayHeight + 1 + grid * 3, grid * 6, 1, 'black');
+				// 	drawRect(0, rayHeight + 2 + grid * 3, grid * 6, 1, bevelColor);
+
+				// 	partyMembers.forEach(partyMember);
+
+				// }
+				// info();
+				// drawRect(grid * 6, rayHeight + 2 + grid, 1, gameHeight - rayHeight - 2 - grid, 'black'); // center border
+				// party();
 			},
 
 			moveForward = () => {
@@ -451,7 +504,7 @@ const dungeon = {
 			},
 
 			turnAround = () => {
-				if(turnAroundTimer < moveTime * 2){
+				if(turnAroundTimer < moveTime){
 					const oldDirX = direction.x, oldPlaneX = plane.x;
 					direction.x = direction.x * Math.cos(rotateSpeed) - direction.y * Math.sin(rotateSpeed);
 					direction.y = oldDirX * Math.sin(rotateSpeed) + direction.y * Math.cos(rotateSpeed);

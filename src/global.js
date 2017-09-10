@@ -31,6 +31,18 @@ const colors = {
 	redLight: '#d95763'
 },
 
+colorsNew = {
+	grayDark: '#4e4a4e',
+	gray: '#8595a1',
+	greenDark: '#346524',
+	green: '#6daa2c',
+	brownDark: '#442434',
+	brown: '#854c30',
+	blueDark: '#30346d',
+	blue: '#597dce',
+	red: '#d04648'
+},
+
 jrpg = {},
 
 circle = Math.PI * 2,
