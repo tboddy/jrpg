@@ -154,6 +154,10 @@ getAspect = () => {
 	else if(newHeight > remHeight) newHeight = remHeight;
 	return {width: newWidth, height: newHeight};
 };
+
+function isMinusZero(value) {
+  return 1/value === -Infinity;
+}
 let gameLoopInterval, isGameOver = false, gameClock = 0;
 
 const initGame = () => {
@@ -218,39 +222,42 @@ const inventoryData = [
 	}
 
 ];
-const mapWidth = 24,
-	mapHeight = 24,
-	position = {x: 1, y: 2}, lastPosition = {x: 0, y: 0},
+const position = {x: 2, y: 2}, 
 	direction = {x: 0.5, y: 0},
 	plane = {x: 0, y: 1},
-	rayHeight = gameHeight - grid * 6,
-	rayWidth = gameWidth;
+	rayHeight = gameHeight - grid * 5,
+	rayWidth = gameWidth + grid * 2,
+	treeWallImage = new Image();
+
+treeWallImage.src = 'img/trees.png';
 
 let map = [
-	['1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1'],
-	['1','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-	['1','.','.','.','.','2','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-	['1','.','.','.','2','2','2','2','2','2','2','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-	['1','.','.','2','2','2','2','2','2','2','2','.','.','.','.','3','.','3','.','3','.','.','.','1'],
-	['1','.','.','2','2','2','2','.','.','.','2','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-	['1','.','.','2','2','2','2','.','.','.','2','.','.','.','.','3','.','.','.','3','.','.','.','1'],
-	['1','.','.','2','2','2','2','.','.','.','2','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-	['1','.','.','2','2','2','2','2','.','2','2','.','.','.','.','3','.','3','.','3','.','.','.','1'],
-	['1','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-	['1','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-	['1','.','.','4','4','3','2','3','4','.','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-	['1','.','.','4','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-	['1','.','.','4','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-	['1','.','.','4','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-	['1','.','.','4','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-	['1','.','.','4','4','4','4','4','4','.','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-	['1','.','.','4','.','.','.','.','4','.','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-	['1','.','.','4','.','.','5','.','4','.','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-	['1','.','.','4','.','.','.','.','4','.','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-	['1','.','.','4','4','4','4','4','4','.','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-	['1','.','.','4','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-	['1','4','4','4','4','4','4','4','4','.','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
+	['1','1','1','1','1','1','1','1','1','1','1','1'],
+
+	['1','.','.','.','.','.','.','.','.','.','.','1'],
+
+	['1','.','.','.','.','.','.','.','.','.','.','1'],
+
+	['1','.','.','2','2','1','1','.','.','2','2','1'],
+
+	['1','.','.','2','2','1','1','.','.','2','2','1'],
+
+	['1','.','.','.','.','2','2','.','.','1','1','1'],
+
+	['1','.','.','.','.','2','2','.','.','1','1','1'],
+
+	['1','.','.','.','.','.','.','.','.','.','.','1'],
+
+	['1','.','.','.','.','.','.','.','.','.','.','1'],
+
+	['1','1','1','1','1','1','1','1','1','1','1','1']
 ];
+
+const moveTime = 8;
+
+const rotateSpeed = (Math.PI / moveTime) / 2;
+
+let turnRightTimer = moveTime, turnLeftTimer = moveTime, moveForwardTimer = moveTime, turnAroundTimer = moveTime * 2;
 
 // map.forEach((row, i) => {
 // 	console.log(row)
@@ -258,7 +265,6 @@ let map = [
 
 // map = map.reverse()
 
-const rotateSpeed = 90 / 500;
 
 const dungeon = {
 
@@ -268,7 +274,7 @@ const dungeon = {
 			let canMove = true;
 			const keysDown = e => {
 				if(canMove){
-					// canMove = false;
+					canMove = false;
 					switch(e.which){
 						case 38: forward(); break;
 						case 37: turnLeft(); break;
@@ -278,32 +284,13 @@ const dungeon = {
 						// case 8: back(); break;
 					};
 				}
-			}, keysUp = () => { canMove = true;
+			}, keysUp = () => {
+				canMove = true;
 			}, forward = () => {
-				if(direction.x == 0.5 && direction.y == 0){ // go east
-					if(map[position.y][position.x + 1] == '.') position.x = position.x + 1;
-				}
-				// else if(direction.x = -0.5 && direction.y == 0){ // go west
-				// 	if(map[position.y][position.x - 1] == '.') position.x = position.x - 1;
-				// }
-			}, turnAround = () => {
-
-			}, turnRight = () => {
-
-				const oldDirX = direction.x, oldPlaneX = plane.x;
-				direction.x = direction.x * Math.cos(rotateSpeed) - direction.y * Math.sin(rotateSpeed);
-				direction.y = oldDirX * Math.sin(rotateSpeed) + direction.y * Math.cos(rotateSpeed);
-	      plane.x = plane.x * Math.cos(rotateSpeed) - plane.y * Math.sin(rotateSpeed);
-	      plane.y = oldPlaneX * Math.sin(rotateSpeed) + plane.y * Math.cos(rotateSpeed);
-
-			}, turnLeft = () => {
-
-				const oldDirX = direction.x, oldPlaneX = plane.x;
-				direction.x = direction.x * Math.cos(-rotateSpeed) - direction.y * Math.sin(-rotateSpeed);
-				direction.y = oldDirX * Math.sin(-rotateSpeed) + direction.y * Math.cos(-rotateSpeed);
-	      plane.x = plane.x * Math.cos(-rotateSpeed) - plane.y * Math.sin(-rotateSpeed);
-	      plane.y = oldPlaneX * Math.sin(-rotateSpeed) + plane.y * Math.cos(-rotateSpeed);
-
+				moveForwardTimer = 0;
+			}, turnAround = () => { turnAroundTimer = 0;
+			}, turnRight = () => { turnRightTimer = 0;
+			}, turnLeft = () => { turnLeftTimer = 0;
 			};
 			document.addEventListener('keydown', keysDown);
 			document.addEventListener('keyup', keysUp);
@@ -318,14 +305,14 @@ const dungeon = {
 		const draw = () => {
 
 			const raycast = () => {
-				let column = 0;
+				let column = 0, columnTextureCount = 0;
 
 				const background = () => {
 					const ceiling = () => {
 						drawRect(0, 0, gameWidth, rayHeight / 2, colors.black);
 					}, floor = () => {
 
-						const floorColor = colors.greenDark, shadowColor = colors.ochre;
+						const floorColor = colors.ochre;
 
 						drawRect(0, rayHeight / 2, gameWidth, rayHeight / 2, floorColor);
 
@@ -333,8 +320,8 @@ const dungeon = {
 							const diff = rayHeight - i - 1;
 							if(diff > 0){
 								context.save();
-								context.globalAlpha = diff / 75;
-								drawRect(0, i + 1, gameWidth, 1, shadowColor);
+								context.globalAlpha = diff / 125;
+								drawRect(0, i + 1, gameWidth, 1, 'black');
 								context.restore();
 							}
 						}
@@ -383,21 +370,23 @@ const dungeon = {
 					if(drawStart < 0) drawStart = 0;
 					if(drawEnd >= rayHeight) drawEnd = rayHeight - 1;
 
-					let wallColor = 'pink', shadowColor = 'black';
+					let wallTexture = treeWallImage;
 					switch(map[mapPosition.y][mapPosition.x]){
 						case '1':
-							wallColor = colors.green;
-							shadowColor = colors.greenDark;
+							wallTexture = treeWallImage
 							break;
 						case '2':
 							wallColor = colors.redLight;
-							shadowColor = colors.red;
 							break;
 					}
-					drawRect(column, drawStart, 1, lineHeight, wallColor);
+
+					// drawRect(column, drawStart, 1, lineHeight, wallColor);
+					// columnTextureCount += column;
+					context.drawImage(treeWallImage, columnTextureCount, 0, 1, 160, column - grid, drawStart, 1, lineHeight);
+
 					context.save();
-					context.globalAlpha = (rayHeight - lineHeight) / 150;
-					drawRect(column, drawStart, 1, lineHeight, shadowColor);
+					context.globalAlpha = (rayHeight - lineHeight) / 250;
+					drawRect(column - grid, drawStart, 1, lineHeight, 'black');
 					context.restore();
 
 				};
@@ -406,6 +395,8 @@ const dungeon = {
 				while(column < rayWidth){
 					wall();
 					column++;
+					columnTextureCount++;
+					if(columnTextureCount >= 120) columnTextureCount = 0;
 				}
 			},
 
@@ -413,11 +404,69 @@ const dungeon = {
 				drawRect(0, rayHeight + 1, gameWidth, gameHeight - rayHeight - 1, colors.purpleDarker); // bg
 				drawRect(0, rayHeight + 1, gameWidth, 1, colors.purpleDark); // top bevel
 				drawRect(grid * 6, rayHeight + 1, 1, gameHeight - rayHeight - 1, 'black'); // center border
+			},
 
+			moveForward = () => {
+				if(moveForwardTimer < 2){
+					const forwardTime = 1;
+					let newDirX = Math.round(direction.x * 100), newDirY = Math.round(direction.y * 100);
+					newDirX = newDirX / 100;
+					newDirY = newDirY / 100;
+					if(newDirX == 0.5 && newDirY == 0){ // east
+						if(map[position.y][position.x + 1] == '.' && map[position.y - 1][position.x + 1] == '.') position.x += forwardTime;
+					}
+					else if(newDirX == -0.5 && newDirY == 0){ // west
+						if(map[position.y][position.x - 2] == '.' && map[position.y - 1][position.x - 2] == '.') position.x -= forwardTime;
+					}
+					else if(newDirX == 0 && newDirY == 0.5){ // south
+						if(map[position.y + 1][position.x] == '.' && map[position.y + 1][position.x - 1] == '.') position.y += forwardTime;
+					}
+					else if(newDirX == 0 && newDirY == -0.5){ // north
+						if(map[position.y - 2][position.x] == '.' && map[position.y - 2][position.x - 1] == '.') position.y -= forwardTime;
+					} 
+				}
+				moveForwardTimer++;
+			}
+
+			turnRight = () => {
+				if(turnRightTimer < moveTime){
+					const oldDirX = direction.x, oldPlaneX = plane.x;
+					direction.x = direction.x * Math.cos(rotateSpeed) - direction.y * Math.sin(rotateSpeed);
+					direction.y = oldDirX * Math.sin(rotateSpeed) + direction.y * Math.cos(rotateSpeed);
+					plane.x = plane.x * Math.cos(rotateSpeed) - plane.y * Math.sin(rotateSpeed);
+					plane.y = oldPlaneX * Math.sin(rotateSpeed) + plane.y * Math.cos(rotateSpeed);
+				}
+				turnRightTimer++;
+			},
+
+			turnLeft = () => {
+				if(turnLeftTimer < moveTime){
+					const oldDirX = direction.x, oldPlaneX = plane.x;
+					direction.x = direction.x * Math.cos(-rotateSpeed) - direction.y * Math.sin(-rotateSpeed);
+					direction.y = oldDirX * Math.sin(-rotateSpeed) + direction.y * Math.cos(-rotateSpeed);
+					plane.x = plane.x * Math.cos(-rotateSpeed) - plane.y * Math.sin(-rotateSpeed);
+					plane.y = oldPlaneX * Math.sin(-rotateSpeed) + plane.y * Math.cos(-rotateSpeed);
+				}
+				turnLeftTimer++;
+			},
+
+			turnAround = () => {
+				if(turnAroundTimer < moveTime * 2){
+					const oldDirX = direction.x, oldPlaneX = plane.x;
+					direction.x = direction.x * Math.cos(rotateSpeed) - direction.y * Math.sin(rotateSpeed);
+					direction.y = oldDirX * Math.sin(rotateSpeed) + direction.y * Math.cos(rotateSpeed);
+					plane.x = plane.x * Math.cos(rotateSpeed) - plane.y * Math.sin(rotateSpeed);
+					plane.y = oldPlaneX * Math.sin(rotateSpeed) + plane.y * Math.cos(rotateSpeed);
+				}
+				turnAroundTimer++;
 			};
 
 			raycast();
 			chrome();
+			moveForward();
+			turnRight();
+			turnLeft();
+			turnAround();
 
 		};
 

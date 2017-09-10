@@ -115,3 +115,7 @@ getAspect = () => {
 	else if(newHeight > remHeight) newHeight = remHeight;
 	return {width: newWidth, height: newHeight};
 };
+
+function isMinusZero(value) {
+  return 1/value === -Infinity;
+}
