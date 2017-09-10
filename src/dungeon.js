@@ -1,17 +1,19 @@
 const position = {x: 3, y: 3}, 
 	direction = {x: 0.5, y: 0},
-	plane = {x: 0, y: 0.8},
+	plane = {x: 0, y: 1},
 	rayHeight = gameHeight - grid * 6,
 	rayWidth = gameWidth,
 	treeWallImage = new Image(),
 	bricks1WallImage = new Image(),
 	door1Image = new Image(),
-	door2Image = new Image();
+	door2Image = new Image(),
+	vineTexture = new Image();
 
 treeWallImage.src = 'img/trees.png';
 bricks1WallImage.src = 'img/bricks1.png';
 door1Image.src = 'img/door1.png';
 door2Image.src = 'img/door2.png';
+vineTexture.src = 'img/vines.png';
 
 const bricks1WallImageHeight = grid, bricks1WallImageWidth = grid;
 
@@ -19,9 +21,9 @@ let map = [
 	['1','1','1','1','1','1','1','1'],
 	['1','.','.','.','.','.','.','1'],
 	['1','.','.','1','2','1','.','1'],
-	['1','.','1','1','1','1','1','1'],
-	['1','.','1','1','1','1','1','1'],
-	['1','.','.','.','.','.','.','1'],
+	['1','.','1','1','1','.','.','1'],
+	['1','.','1','1','1','.','.','1'],
+	['1','.','.','1','2','1','.','1'],
 	['1','.','.','.','.','.','.','1'],
 	['1','1','1','1','1','1','1','1']
 ];
@@ -117,7 +119,7 @@ const dungeon = {
 						}
 					}, floor = () => {
 						const floorColor = colorsNewer[3], shadowColor = colorsNewer[1];
-						drawRect(0, rayHeight / 2, gameWidth, rayHeight / 2, floorColor);
+						drawRect(0, rayHeight / 2 + 1, gameWidth, rayHeight / 2 - 1, floorColor);
 						for(i = rayHeight / 2; i < rayHeight; i++){
 							const diff = rayHeight - i - 1;
 							if(diff > 0){
@@ -170,27 +172,31 @@ const dungeon = {
 					let drawStart = -lineHeight / 2 + rayHeight / 2;
 					if(drawStart < 0) drawStart = 0;
 
-					let wallTexture = treeWallImage, textureHeight = grid * 4;
+					let wallTexture = bricks1WallImage, textureHeight = grid * 4;
 					switch(map[mapPosition.y][mapPosition.x]){
 						case '1':
 							wallTexture = bricks1WallImage;
 							break;
-						case '2':
-							wallTexture = door2Image;
-							break;
-						case '3':
-							wallTexture = door1Image;
-							break;
+						// case '2':
+						// 	wallTexture = door2Image;
+						// 	break;
+						// case '3':
+						// 	wallTexture = door1Image;
+						// 	break;
 					}
-
-					context.drawImage(wallTexture, columnTextureCount, 0, 1, textureHeight, column, drawStart, 1, lineHeight);
-					if(gameClock < 1) console.log(columnTextureCount)
-
-					context.save();
-					context.globalAlpha = (rayHeight - lineHeight) / 250;
-					drawRect(column, drawStart, 1, lineHeight, 'black');
-					context.restore();
-
+					// if(lineHeight >= grid / 2){
+						context.drawImage(wallTexture, columnTextureCount, 0, 1, textureHeight, column, drawStart, 1, lineHeight);
+						if(lineHeight <= rayHeight / 2){
+							context.save();
+							context.globalAlpha = (rayHeight / 2 - lineHeight) / 125;
+							drawRect(column, drawStart, 1, lineHeight, 'black');
+							context.restore();
+						}
+						context.save();
+						context.globalAlpha = 0.67;
+						context.drawImage(vineTexture, columnTextureCount, 0, 1, textureHeight, column, drawStart - 4, 1, lineHeight + 8);
+						context.restore();
+					// }
 				};
 
 				background();
@@ -202,35 +208,55 @@ const dungeon = {
 				}
 			},
 
+			minimap = () => {
+
+			};
+
 			chrome = () => {
 
-
 				const bgColor = colorsNewer[3], bevelColor = colorsNewer[4];
-				drawRect(0, rayHeight + 1, gameWidth, gameHeight - rayHeight - 1, bgColor); // bg
-				drawRect(0, rayHeight + 1, gameWidth, 1, bevelColor); // bevel
 
-				// const info = () => {
-				// 	drawRect(0, rayHeight + 1, gameWidth, 1, bevelColor);
-				// 	drawRect(0, rayHeight + 1 + grid, gameWidth, 1, 'black');
-				// 	// drawString('dungeon crawlin...', grid / 2, rayHeight + 6);
-				// }, party = () => {
+				const background = () => {
+					drawRect(0, rayHeight + 1, gameWidth, gameHeight - rayHeight - 1, bgColor); // bg
+					drawRect(0, rayHeight + 1, gameWidth, 1, bevelColor); // bevel
+				},
 
-				// 	const partyMember = (member, i) => {
-				// 		drawString(member.name, grid / 4, rayHeight + 6 + grid * (i + 1));
-				// 	};
+				minimap = () => {
+					const mapSize = gameHeight - rayHeight - 1 - grid / 2, mapY = rayHeight + 1 + grid / 4, mapX = grid / 4;
+					const frame = () => {
+						drawRect(mapX, mapY, mapSize, mapSize, colorsNewer[0]); // bg border
+						drawRect(mapX + 1, mapY + 1, mapSize - 2, mapSize - 2, colorsNewer[1]); // bg
+						drawRect(mapX, mapY + mapSize, mapSize, 1, bevelColor);
+					}, tiles = () => {
+						// drawRect(mapX + 5, mapY + 5, 2, 2, colorsNewer[3])
 
-				// 	drawRect(0, rayHeight + 2 + grid, grid * 6, 1, bevelColor);
-				// 	drawRect(0, rayHeight + 1 + grid * 2, grid * 6, 1, 'black');
-				// 	drawRect(0, rayHeight + 2 + grid * 2, grid * 6, 1, bevelColor);
-				// 	drawRect(0, rayHeight + 1 + grid * 3, grid * 6, 1, 'black');
-				// 	drawRect(0, rayHeight + 2 + grid * 3, grid * 6, 1, bevelColor);
+						let bgColor = colorsNewer[1], gridColor = colorsNewer[3], activeColor = colorsNewer[15]
 
-				// 	partyMembers.forEach(partyMember);
+						map.forEach((row, y) => {
+							row.forEach((grid, x) => {
+								if(grid == '.'){
+									const xOffset = 2 * (x + 1),
+										yOffset = 2 * (y + 1);
+									if((x == position.x && y == position.y) ||
+										(x + 1 == position.x && y == position.y) ||
+										(x == position.x && y + 1 == position.y) ||
+										(x + 1 == position.x && y + 1 == position.y)){
+										drawRect(mapX + xOffset - 1, mapY + yOffset - 1, 2, 2, activeColor);
+									} else {
+										drawRect(mapX + xOffset - 1, mapY + yOffset - 1, 2, 2, gridColor)
+									}
+								}
+							});
+						});
 
-				// }
-				// info();
-				// drawRect(grid * 6, rayHeight + 2 + grid, 1, gameHeight - rayHeight - 2 - grid, 'black'); // center border
-				// party();
+					};
+					frame();
+					tiles();
+				};
+
+				background();
+				minimap();
+
 			},
 
 			moveForward = () => {
