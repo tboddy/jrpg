@@ -18,15 +18,31 @@ vineTexture.src = 'img/vines.png';
 const bricks1WallImageHeight = grid, bricks1WallImageWidth = grid;
 
 let map = [
-	['1','1','1','1','1','1','1','1'],
-	['1','.','.','.','.','.','.','1'],
-	['1','.','.','1','2','1','.','1'],
-	['1','.','1','1','1','.','.','1'],
-	['1','.','1','1','1','.','.','1'],
-	['1','.','.','1','2','1','.','1'],
-	['1','.','.','.','.','.','.','1'],
-	['1','1','1','1','1','1','1','1']
+	['1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1'],
+	['1','1','1','1','1','1','1','1','1','1','.','1','1','1','1','1','1','1','1','1','1'],
+	['1','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
+	['1','.','1','1','1','1','1','1','1','1','.','1','1','1','1','1','1','1','1','.','1'],
+	['1','.','1','1','1','1','1','1','1','1','.','1','1','1','1','1','1','1','1','.','1'],
+	['1','.','1','1','1','.','.','.','.','.','.','.','.','.','.','.','1','1','1','.','1'],
+	['1','.','1','1','1','.','1','1','1','1','.','1','1','1','1','.','1','1','1','.','1'],
+	['1','.','1','1','1','.','1','1','1','1','.','1','1','1','.','.','.','1','1','.','1'],
+	['1','.','1','1','1','.','1','1','1','.','.','.','1','1','.','.','.','1','1','.','1'],
+	['1','.','1','1','1','.','1','1','1','.','1','.','1','1','1','.','1','1','1','.','1'],
+	['1','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
+	['1','.','1','1','1','.','1','1','1','.','1','.','1','1','1','.','1','1','1','.','1'],
+	['1','.','1','1','.','.','.','1','1','.','.','.','1','1','1','.','1','1','1','.','1'],
+	['1','.','1','1','.','.','.','1','1','1','.','1','1','1','1','.','1','1','1','.','1'],
+	['1','.','1','1','1','.','1','1','1','1','.','1','1','1','1','.','1','1','1','.','1'],
+	['1','.','1','1','1','.','.','.','.','.','.','.','.','.','.','.','1','1','1','.','1'],
+	['1','.','1','1','1','1','1','1','1','1','.','1','1','1','1','1','1','1','1','.','1'],
+	['1','.','1','1','1','1','1','1','1','1','.','1','1','1','1','1','1','1','1','.','1'],
+	['1','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
+	['1','1','1','1','1','1','1','1','1','1','.','1','1','1','1','1','1','1','1','1','1'],
+	['1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1']
 ];
+
+position.x = Math.round(map[0].length / 2) + 10;
+position.y = Math.round(map.length / 2) + 10;
 
 const moveTime = 8;
 
@@ -50,7 +66,6 @@ const dungeon = {
 	setup(){
 
 		const parseMap = () => {
-
 			console.log('map is ' + map[0].length + 'x' + map.length);
 			map.forEach((row, i) => {
 				map[i] = row.reduce((res, current, index, array) => {
@@ -62,7 +77,6 @@ const dungeon = {
 			map = map.reduce((res, current, index, array) => {
 				return res.concat([current, current]);
 			}, []);
-
 		}, controls = () => {
 			let canMove = true;
 			const keysDown = e => {
@@ -208,10 +222,6 @@ const dungeon = {
 				}
 			},
 
-			minimap = () => {
-
-			};
-
 			chrome = () => {
 
 				const bgColor = colorsNewer[3], bevelColor = colorsNewer[4];
@@ -224,14 +234,11 @@ const dungeon = {
 				minimap = () => {
 					const mapSize = gameHeight - rayHeight - 1 - grid / 2, mapY = rayHeight + 1 + grid / 4, mapX = grid / 4;
 					const frame = () => {
-						drawRect(mapX, mapY, mapSize, mapSize, colorsNewer[0]); // bg border
-						drawRect(mapX + 1, mapY + 1, mapSize - 2, mapSize - 2, colorsNewer[1]); // bg
-						drawRect(mapX, mapY + mapSize, mapSize, 1, bevelColor);
+						drawRect(mapX, mapY, mapSize + 1, mapSize + 1, colorsNewer[0]); // bg border
+						drawRect(mapX + 1, mapY + 1, mapSize - 1, mapSize - 1, colorsNewer[1]); // bg
+						drawRect(mapX, mapY + mapSize + 1, mapSize + 1, 1, bevelColor);
 					}, tiles = () => {
-						// drawRect(mapX + 5, mapY + 5, 2, 2, colorsNewer[3])
-
 						let bgColor = colorsNewer[1], gridColor = colorsNewer[3], activeColor = colorsNewer[15]
-
 						map.forEach((row, y) => {
 							row.forEach((grid, x) => {
 								if(grid == '.'){
@@ -241,14 +248,13 @@ const dungeon = {
 										(x + 1 == position.x && y == position.y) ||
 										(x == position.x && y + 1 == position.y) ||
 										(x + 1 == position.x && y + 1 == position.y)){
-										drawRect(mapX + xOffset - 1, mapY + yOffset - 1, 2, 2, activeColor);
+										drawRect(mapX + xOffset, mapY + yOffset, 2, 2, activeColor);
 									} else {
-										drawRect(mapX + xOffset - 1, mapY + yOffset - 1, 2, 2, gridColor)
+										drawRect(mapX + xOffset, mapY + yOffset, 2, 2, gridColor)
 									}
 								}
 							});
 						});
-
 					};
 					frame();
 					tiles();
