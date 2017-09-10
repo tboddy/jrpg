@@ -5,11 +5,13 @@ const position = {x: 3, y: 3},
 	rayWidth = gameWidth,
 	treeWallImage = new Image(),
 	bricks1WallImage = new Image(),
-	door1Image = new Image();
+	door1Image = new Image(),
+	door2Image = new Image();
 
 treeWallImage.src = 'img/trees.png';
 bricks1WallImage.src = 'img/bricks1.png';
 door1Image.src = 'img/door1.png';
+door2Image.src = 'img/door2.png';
 
 const bricks1WallImageHeight = grid, bricks1WallImageWidth = grid;
 
@@ -46,15 +48,19 @@ const dungeon = {
 	setup(){
 
 		const parseMap = () => {
+
 			console.log('map is ' + map[0].length + 'x' + map.length);
 			map.forEach((row, i) => {
 				map[i] = row.reduce((res, current, index, array) => {
-					return res.concat([current, current]);
+					let nextCurrent = current;
+					if(current == '2') nextCurrent = '3';
+					return res.concat([current, nextCurrent]);
 				}, []);
 			});
 			map = map.reduce((res, current, index, array) => {
 				return res.concat([current, current]);
 			}, []);
+
 		}, controls = () => {
 			let canMove = true;
 			const keysDown = e => {
@@ -101,7 +107,7 @@ const dungeon = {
 
 				const background = () => {
 					const ceiling = () => {
-						const ceilingColor = colorsNew.gray, shadowColor = colorsNew.grayDark;
+						const ceilingColor = colorsNewer[1], shadowColor = colorsNewer[0];
 						drawRect(0, 0, gameWidth, rayHeight / 2, ceilingColor);
 						for(i = 0; i < rayHeight / 2; i++){
 							context.save();
@@ -110,7 +116,7 @@ const dungeon = {
 							context.restore();
 						}
 					}, floor = () => {
-						const floorColor = colorsNew.brown, shadowColor = colorsNew.brownDark;
+						const floorColor = colorsNewer[3], shadowColor = colorsNewer[1];
 						drawRect(0, rayHeight / 2, gameWidth, rayHeight / 2, floorColor);
 						for(i = rayHeight / 2; i < rayHeight; i++){
 							const diff = rayHeight - i - 1;
@@ -170,11 +176,15 @@ const dungeon = {
 							wallTexture = bricks1WallImage;
 							break;
 						case '2':
+							wallTexture = door2Image;
+							break;
+						case '3':
 							wallTexture = door1Image;
 							break;
 					}
 
 					context.drawImage(wallTexture, columnTextureCount, 0, 1, textureHeight, column, drawStart, 1, lineHeight);
+					if(gameClock < 1) console.log(columnTextureCount)
 
 					context.save();
 					context.globalAlpha = (rayHeight - lineHeight) / 250;
@@ -195,7 +205,7 @@ const dungeon = {
 			chrome = () => {
 
 
-				const bgColor = colorsNew.grayDark, bevelColor = colorsNew.gray;
+				const bgColor = colorsNewer[3], bevelColor = colorsNewer[4];
 				drawRect(0, rayHeight + 1, gameWidth, gameHeight - rayHeight - 1, bgColor); // bg
 				drawRect(0, rayHeight + 1, gameWidth, 1, bevelColor); // bevel
 
