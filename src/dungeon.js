@@ -1,4 +1,4 @@
-const position = {x: 3, y: 3}, 
+const position = {x: 9, y: 3}, 
 	direction = {x: 0.5, y: 0},
 	plane = {x: 0, y: 1},
 	rayHeight = gameHeight - grid * 6,
@@ -19,32 +19,32 @@ const bricks1WallImageHeight = grid, bricks1WallImageWidth = grid;
 
 let map = [
 	['1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1'],
-	['1','1','1','1','1','1','1','1','1','1','.','1','1','1','1','1','1','1','1','1','1'],
+	['1','.','2','.','.','.','.','.','2','.','.','.','.','.','1','.','2','.','1','.','1'],
+	['1','1','1','.','1','1','1','1','1','.','1','1','1','.','1','1','1','.','1','.','1'],
+	['1','.','.','.','1','1','1','.','.','.','1','.','1','.','2','.','1','.','1','.','1'],
+	['1','.','1','1','1','1','1','2','1','1','1','2','1','1','1','1','1','.','1','2','1'],
+	['1','.','1','.','.','.','1','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
+	['1','.','1','1','1','.','1','.','1','1','1','1','1','2','1','2','1','.','1','1','1'],
+	['1','.','1','.','2','.','1','.','2','.','.','1','.','.','1','.','1','.','2','.','1'],
+	['1','.','1','1','1','.','1','.','1','1','1','1','1','1','1','1','1','.','1','1','1'],
+	['1','.','1','.','.','.','1','.','.','.','1','.','2','.','.','.','.','.','1','.','1'],
+	['1','.','1','1','1','.','1','.','1','1','1','1','1','1','1','1','1','.','1','.','1'],
+	['1','.','.','.','2','.','1','.','2','.','1','.','.','.','1','.','2','.','1','.','1'],
+	['1','1','1','1','1','1','1','.','1','1','1','1','2','1','1','1','1','.','1','2','1'],
 	['1','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-	['1','.','1','1','1','1','1','1','1','1','.','1','1','1','1','1','1','1','1','.','1'],
-	['1','.','1','1','1','1','1','1','1','1','.','1','1','1','1','1','1','1','1','.','1'],
-	['1','.','1','1','1','.','.','.','.','.','.','.','.','.','.','.','1','1','1','.','1'],
-	['1','.','1','1','1','.','1','1','1','1','.','1','1','1','1','.','1','1','1','.','1'],
-	['1','.','1','1','1','.','1','1','1','1','.','1','1','1','.','.','.','1','1','.','1'],
-	['1','.','1','1','1','.','1','1','1','.','.','.','1','1','.','.','.','1','1','.','1'],
-	['1','.','1','1','1','.','1','1','1','.','1','.','1','1','1','.','1','1','1','.','1'],
-	['1','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-	['1','.','1','1','1','.','1','1','1','.','1','.','1','1','1','.','1','1','1','.','1'],
-	['1','.','1','1','.','.','.','1','1','.','.','.','1','1','1','.','1','1','1','.','1'],
-	['1','.','1','1','.','.','.','1','1','1','.','1','1','1','1','.','1','1','1','.','1'],
-	['1','.','1','1','1','.','1','1','1','1','.','1','1','1','1','.','1','1','1','.','1'],
-	['1','.','1','1','1','.','.','.','.','.','.','.','.','.','.','.','1','1','1','.','1'],
-	['1','.','1','1','1','1','1','1','1','1','.','1','1','1','1','1','1','1','1','.','1'],
-	['1','.','1','1','1','1','1','1','1','1','.','1','1','1','1','1','1','1','1','.','1'],
-	['1','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-	['1','1','1','1','1','1','1','1','1','1','.','1','1','1','1','1','1','1','1','1','1'],
+	['1','1','1','1','1','1','1','.','1','2','1','1','1','.','1','2','1','1','1','2','1'],
+	['1','.','.','.','.','.','1','.','1','.','1','.','2','.','1','.','1','1','1','.','1'],
+	['1','2','1','2','1','.','1','.','1','1','1','1','1','.','1','1','1','1','1','1','1'],
+	['1','.','1','.','1','.','2','.','1','.','.','.','1','.','2','.','1','.','1','.','1'],
+	['1','.','1','.','1','.','1','.','1','1','2','1','1','.','1','1','1','2','1','2','1'],
+	['1','.','1','.','1','.','1','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
 	['1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1']
 ];
 
-position.x = Math.round(map[0].length / 2) + 10;
-position.y = Math.round(map.length / 2) + 10;
+// position.x = Math.round(map[0].length / 2) + 10;
+// position.y = Math.round(map.length / 2) + 10;
 
-const moveTime = 8;
+const moveTime = 8, acceptedTiles = ['.', '2', '3']
 
 const rotateSpeed = (Math.PI / moveTime) / 2, randomEncounterSteps = 12;
 
@@ -92,6 +92,7 @@ const dungeon = {
 					};
 				}
 			}, keysUp = () => {
+				// setTimeout(() => {canMove = true;}, moveTime);
 				canMove = true;
 			}, forward = () => {
 				moveForwardTimer = 0;
@@ -178,7 +179,7 @@ const dungeon = {
 							mapPosition.y += step.y;
 							side = 1;
 						}
-						if(map[mapPosition.y] && (map[mapPosition.y][mapPosition.x] != '.')) hit = 1;
+						if(map[mapPosition.y] && acceptedTiles.indexOf(map[mapPosition.y][mapPosition.x]) == -1) hit = 1;
 					}
 					perpWallDist = side == 0 ? (mapPosition.x - rayPosition.x + (1 - step.x) / 2) / rayDirection.x :
 						(mapPosition.y - rayPosition.y + (1 - step.y) / 2) / rayDirection.y;
@@ -238,20 +239,24 @@ const dungeon = {
 						drawRect(mapX + 1, mapY + 1, mapSize - 1, mapSize - 1, colorsNewer[1]); // bg
 						drawRect(mapX, mapY + mapSize + 1, mapSize + 1, 1, bevelColor);
 					}, tiles = () => {
-						let bgColor = colorsNewer[1], gridColor = colorsNewer[3], activeColor = colorsNewer[15]
+						let bgColor = colorsNewer[1],
+							gridColor = colorsNewer[3],
+							activeColor = colorsNewer[15],
+							doorColor = colorsNewer[14];
 						map.forEach((row, y) => {
 							row.forEach((grid, x) => {
+								const xOffset = 2 * (x + 1), yOffset = 2 * (y + 1);
 								if(grid == '.'){
-									const xOffset = 2 * (x + 1),
-										yOffset = 2 * (y + 1);
 									if((x == position.x && y == position.y) ||
 										(x + 1 == position.x && y == position.y) ||
 										(x == position.x && y + 1 == position.y) ||
 										(x + 1 == position.x && y + 1 == position.y)){
 										drawRect(mapX + xOffset, mapY + yOffset, 2, 2, activeColor);
 									} else {
-										drawRect(mapX + xOffset, mapY + yOffset, 2, 2, gridColor)
+										drawRect(mapX + xOffset, mapY + yOffset, 2, 2, gridColor);
 									}
+								} else if(grid == '2'){
+									drawRect(mapX + xOffset, mapY + yOffset, 4, 2, doorColor);
 								}
 							});
 						});
@@ -267,21 +272,26 @@ const dungeon = {
 
 			moveForward = () => {
 				if(moveForwardTimer < 2){
+
+					const canPass = input => {
+						return acceptedTiles.indexOf(input) > -1 ? true : false;
+					};
+
 					const forwardTime = 1;
 					let newDirX = Math.round(direction.x * 100), newDirY = Math.round(direction.y * 100);
 					newDirX = newDirX / 100;
 					newDirY = newDirY / 100;
 					if(newDirX == 0.5 && newDirY == 0){ // east
-						if(map[position.y][position.x + 1] == '.' && map[position.y - 1][position.x + 1] == '.') position.x += forwardTime;
+						if(canPass(map[position.y][position.x + 1]) && canPass(map[position.y - 1][position.x + 1])) position.x += forwardTime;
 					}
 					else if(newDirX == -0.5 && newDirY == 0){ // west
-						if(map[position.y][position.x - 2] == '.' && map[position.y - 1][position.x - 2] == '.') position.x -= forwardTime;
+						if(canPass(map[position.y][position.x - 2]) && canPass(map[position.y - 1][position.x - 2])) position.x -= forwardTime;
 					}
 					else if(newDirX == 0 && newDirY == 0.5){ // south
-						if(map[position.y + 1][position.x] == '.' && map[position.y + 1][position.x - 1] == '.') position.y += forwardTime;
+						if(canPass(map[position.y + 1][position.x]) && canPass(map[position.y + 1][position.x - 1])) position.y += forwardTime;
 					}
 					else if(newDirX == 0 && newDirY == -0.5){ // north
-						if(map[position.y - 2][position.x] == '.' && map[position.y - 2][position.x - 1] == '.') position.y -= forwardTime;
+						if(canPass(map[position.y - 2][position.x]) && canPass(map[position.y - 2][position.x - 1])) position.y -= forwardTime;
 					} 
 				}
 				moveForwardTimer++;
@@ -310,7 +320,7 @@ const dungeon = {
 			},
 
 			turnAround = () => {
-				if(turnAroundTimer < moveTime){
+				if(turnAroundTimer < moveTime * 2){
 					const oldDirX = direction.x, oldPlaneX = plane.x;
 					direction.x = direction.x * Math.cos(rotateSpeed) - direction.y * Math.sin(rotateSpeed);
 					direction.y = oldDirX * Math.sin(rotateSpeed) + direction.y * Math.cos(rotateSpeed);
