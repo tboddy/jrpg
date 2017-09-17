@@ -3,6 +3,7 @@ module.exports = function(grunt) {
 		concat: {
 			development: {
 				src: [
+					'src/map.js',
 					'src/bestiary.js',
 					'src/global.js',
 					'src/game.js',

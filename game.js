@@ -1,3 +1,41 @@
+(function(name,data){
+ if(typeof onTileMapLoaded === 'undefined') {
+  if(typeof TileMaps === 'undefined') TileMaps = {};
+  TileMaps[name] = data;
+ } else {
+  onTileMapLoaded(name,data);
+ }
+ if(typeof module === 'object' && module && module.exports) {
+  module.exports = data;
+ }})("map",
+{ "height":21,
+ "layers":[
+        {
+         "data":[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+         "height":21,
+         "name":"Tile Layer 1",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true,
+         "width":21,
+         "x":0,
+         "y":0
+        }],
+ "nextobjectid":1,
+ "orientation":"orthogonal",
+ "renderorder":"right-down",
+ "tiledversion":"1.0.3",
+ "tileheight":16,
+ "tilesets":[
+        {
+         "firstgid":1,
+         "source":"..\/..\/Desktop\/tiles1.tsx"
+        }],
+ "tilewidth":16,
+ "type":"map",
+ "version":1,
+ "width":21
+});
 const enemyArcherImg = new Image(), enemyZombieImg = new Image();
 enemyArcherImg.src = 'img/enemy-bowman.png';
 enemyZombieImg.src = 'img/enemy-zombie.png';
@@ -186,9 +224,9 @@ getAspect = () => {
 	return {width: newWidth, height: newHeight};
 };
 
-function isMinusZero(value) {
-  return 1/value === -Infinity;
-}
+isMinusZero = value => {
+	return 1 / value === -Infinity;
+};
 let gameLoopInterval, isGameOver = false, gameClock = 0;
 
 const initGame = () => {
@@ -253,7 +291,7 @@ const inventoryData = [
 	}
 
 ];
-const position = {x: 9, y: 3}, 
+const position = {x: 3, y: 3}, 
 	direction = {x: 0.5, y: 0},
 	plane = {x: 0, y: 1},
 	rayHeight = gameHeight - grid * 6,
@@ -274,29 +312,31 @@ floor1Image.src = 'img/floor1.png';
 
 const bricks1WallImageHeight = grid, bricks1WallImageWidth = grid;
 
-let map = [
-	['1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1'],
-	['1','.','2','.','.','.','.','.','2','.','.','.','.','.','1','.','2','.','1','.','1'],
-	['1','1','1','.','1','1','1','1','1','.','1','1','1','.','1','1','1','.','1','.','1'],
-	['1','.','.','.','1','1','1','.','.','.','1','.','1','.','2','.','1','.','1','.','1'],
-	['1','.','1','1','1','1','1','2','1','1','1','2','1','1','1','1','1','.','1','2','1'],
-	['1','.','1','.','.','.','1','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-	['1','.','1','1','1','.','1','.','1','1','1','1','1','2','1','2','1','.','1','1','1'],
-	['1','.','1','.','2','.','1','.','2','.','.','1','.','.','1','.','1','.','2','.','1'],
-	['1','.','1','1','1','.','1','.','1','1','1','1','1','1','1','1','1','.','1','1','1'],
-	['1','.','1','.','.','.','1','.','.','.','1','.','2','.','.','.','.','.','1','.','1'],
-	['1','.','1','1','1','.','1','.','1','1','1','1','1','1','1','1','1','.','1','.','1'],
-	['1','.','.','.','2','.','1','.','2','.','1','.','.','.','1','.','2','.','1','.','1'],
-	['1','1','1','1','1','1','1','.','1','1','1','1','2','1','1','1','1','.','1','2','1'],
-	['1','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-	['1','1','1','1','1','1','1','.','1','2','1','1','1','.','1','2','1','1','1','2','1'],
-	['1','.','.','.','.','.','1','.','1','.','1','.','2','.','1','.','1','1','1','.','1'],
-	['1','2','1','2','1','.','1','.','1','1','1','1','1','.','1','1','1','1','1','1','1'],
-	['1','.','1','.','1','.','2','.','1','.','.','.','1','.','2','.','1','.','1','.','1'],
-	['1','.','1','.','1','.','1','.','1','1','2','1','1','.','1','1','1','2','1','2','1'],
-	['1','.','1','.','1','.','1','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-	['1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1']
-];
+// let map = [
+// 	['1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1'],
+// 	['1','.','2','.','.','.','.','.','2','.','.','.','.','.','1','.','2','.','1','.','1'],
+// 	['1','1','1','.','1','1','1','1','1','.','1','1','1','.','1','1','1','.','1','.','1'],
+// 	['1','.','.','.','1','1','1','.','.','.','1','.','1','.','2','.','1','.','1','.','1'],
+// 	['1','.','1','1','1','1','1','2','1','1','1','2','1','1','1','1','1','.','1','2','1'],
+// 	['1','.','1','.','.','.','1','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
+// 	['1','.','1','1','1','.','1','.','1','1','1','1','1','2','1','2','1','.','1','1','1'],
+// 	['1','.','1','.','2','.','1','.','2','.','.','1','.','.','1','.','1','.','2','.','1'],
+// 	['1','.','1','1','1','.','1','.','1','1','1','1','1','1','1','1','1','.','1','1','1'],
+// 	['1','.','1','.','.','.','1','.','.','.','1','.','2','.','.','.','.','.','1','.','1'],
+// 	['1','.','1','1','1','.','1','.','1','1','1','1','1','1','1','1','1','.','1','.','1'],
+// 	['1','.','.','.','2','.','1','.','2','.','1','.','.','.','1','.','2','.','1','.','1'],
+// 	['1','1','1','1','1','1','1','.','1','1','1','1','2','1','1','1','1','.','1','2','1'],
+// 	['1','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
+// 	['1','1','1','1','1','1','1','.','1','2','1','1','1','.','1','2','1','1','1','2','1'],
+// 	['1','.','.','.','.','.','1','.','1','.','1','.','2','.','1','.','1','1','1','.','1'],
+// 	['1','2','1','2','1','.','1','.','1','1','1','1','1','.','1','1','1','1','1','1','1'],
+// 	['1','.','1','.','1','.','2','.','1','.','.','.','1','.','2','.','1','.','1','.','1'],
+// 	['1','.','1','.','1','.','1','.','1','1','2','1','1','.','1','1','1','2','1','2','1'],
+// 	['1','.','1','.','1','.','1','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
+// 	['1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1']
+// ];
+
+let map = [], currentTileMap = TileMaps.map;
 
 // position.x = Math.round(map[0].length / 2) + 10;
 // position.y = Math.round(map.length / 2) + 10;
@@ -323,17 +363,27 @@ const dungeon = {
 	setup(){
 
 		const parseMap = () => {
+
+			currentTileMap.layers[0].data.forEach((cell, i) => {
+				if(i % 21 == 0) map.push([]);
+				cell = String(cell);
+				map[map.length - 1].push(cell);
+			});
+
 			console.log('map is ' + map[0].length + 'x' + map.length);
 			map.forEach((row, i) => {
 				map[i] = row.reduce((res, current, index, array) => {
 					let nextCurrent = current;
-					if(current == '2') nextCurrent = '3';
+					// if(current == '2') nextCurrent = '3';
 					return res.concat([current, nextCurrent]);
 				}, []);
 			});
 			map = map.reduce((res, current, index, array) => {
 				return res.concat([current, current]);
 			}, []);
+
+			console.log(map);
+
 		}, controls = () => {
 			let canMove = true;
 			const keysDown = e => {
@@ -378,7 +428,6 @@ const dungeon = {
 
 			const raycast = () => {
 				let column = 0, columnTextureCount = 0;
-
 				const ceiling = () => {
 					const ceilingColor = colorsNewer[1], shadowColor = colorsNewer[0];
 					drawRect(0, 0, gameWidth, rayHeight / 2, ceilingColor);
@@ -391,28 +440,15 @@ const dungeon = {
 				}, floor = () => {
 					let floorTextureCount = 0;
 					const floorColor = colorsNewer[3], shadowColor = colorsNewer[1], textureSize = 16; 
-					// drawRect(0, rayHeight / 2 + 1, gameWidth, rayHeight / 2 - 1, floorColor);
-					for(i = rayHeight / 2; i < rayHeight; i++){
-						const diff = rayHeight - i - 1;
-
-						const rowOffset = diff * 2;
-						const rowWidth = (gameWidth - (diff * 4)) * 2;
-
-						context.drawImage(floor1Image, 0, floorTextureCount, gameWidth, 1, rowOffset, i + 1, rowWidth, 1);
-
-
-
-						// if(diff > 0){
-						// 	context.save();
-						// 	context.globalAlpha = diff / 75;
-						// 	drawRect(0, i + 1, gameWidth, 1, shadowColor);
-						// 	context.drawImage(floor1Image, 0, floorTextureCount, textureSize, 1, 0, i + 1, textureSize, textureSize);
-						// 	context.restore();
-						// }
-						floorTextureCount++;
-						if(floorTextureCount >= 16) floorTextureCount = 0;
+					drawRect(0, rayHeight / 2 + 1, gameWidth, rayHeight / 2 - 1, floorColor);
+					for(i = rayHeight / 2; i < rayHeight + 1; i++){
+						let diff = (i - rayHeight / 2) / 75;
+						diff = 1 - diff;
+						context.save();
+						context.globalAlpha = diff;
+						drawRect(0, i - 1, gameWidth, 1, shadowColor);
+						context.restore();
 					}
-
 				},
 				wall = () => {
 					const cameraX = 2 * column / rayWidth - 1, rayPosition = {x: position.x, y: position.y}, sideDist = {x: 0, y: 0}, step = {x: 0, y: 0};
@@ -466,10 +502,25 @@ const dungeon = {
 						// 	break;
 					}
 					// if(lineHeight >= grid / 2){
+
+						let diff = 0;
+						if(column < gameWidth / 2){
+							diff = gameWidth / 2 - (gameWidth / 2 - column);
+							diff = Math.floor(diff / 10);
+							// diff = (diff / (gameWidth / 2)) * 10;
+						} else {
+							diff = 0;
+						}
+
+						// if(gameClock < 1) console.log(columnTextureCount)
+						if(gameClock < 1) {
+							// console.log(diff)
+						}
+
 						context.drawImage(wallTexture, columnTextureCount, 0, 1, textureHeight, column, drawStart, 1, lineHeight);
 						if(lineHeight <= rayHeight / 2){
 							context.save();
-							context.globalAlpha = (rayHeight / 2 - lineHeight) / 125;
+							context.globalAlpha = (rayHeight / 2 - lineHeight) / 100;
 							drawRect(column, drawStart, 1, lineHeight, 'black');
 							context.restore();
 						}
@@ -479,7 +530,6 @@ const dungeon = {
 						context.restore();
 					// }
 				};
-
 				ceiling();
 				floor();
 				while(column < rayWidth){
@@ -513,7 +563,7 @@ const dungeon = {
 						map.forEach((row, y) => {
 							row.forEach((grid, x) => {
 								const xOffset = 2 * (x + 1), yOffset = 2 * (y + 1);
-								if(grid == '.'){
+								if(grid == '2'){
 									if((x == position.x && y == position.y) ||
 										(x + 1 == position.x && y == position.y) ||
 										(x == position.x && y + 1 == position.y) ||
@@ -522,9 +572,10 @@ const dungeon = {
 									} else {
 										drawRect(mapX + xOffset, mapY + yOffset, 2, 2, gridColor);
 									}
-								} else if(grid == '2'){
-									drawRect(mapX + xOffset, mapY + yOffset, 4, 2, doorColor);
 								}
+								// else if(grid == '2'){
+								// 	drawRect(mapX + xOffset, mapY + yOffset, 4, 2, doorColor);
+								// }
 							});
 						});
 					};
