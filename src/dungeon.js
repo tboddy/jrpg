@@ -1,5 +1,6 @@
-const position = {x: 3, y: 3}, 
-	direction = {x: 0.5, y: 0},
+const position = {x: 5, y: 3},
+	lastPosition = {x: false, y: false},
+	direction = {x: 0.5, y: 0.0},
 	plane = {x: 0, y: 1},
 	rayHeight = gameHeight - grid * 6,
 	rayWidth = gameWidth,
@@ -48,11 +49,11 @@ let map = [], currentTileMap = TileMaps.map;
 // position.x = Math.round(map[0].length / 2) + 10;
 // position.y = Math.round(map.length / 2) + 10;
 
-const moveTime = 8, acceptedTiles = ['.', '2', '3']
+const moveTime = 32, acceptedTiles = ['.', '2', '3']
 
-const rotateSpeed = (Math.PI / moveTime) / 2, randomEncounterSteps = 12;
+const rotateSpeed = (Math.PI / moveTime) / 2, randomEncounterSteps = 10;
 
-let turnRightTimer = moveTime, turnLeftTimer = moveTime, moveForwardTimer = moveTime, turnAroundTimer = moveTime * 2,
+let turnRightTimer = moveTime, turnLeftTimer = moveTime, moveTimer = moveTime + 1, turnAroundTimer = moveTime * 2, canMove = true,
 	currentSteps = 0, inBattle = false;
 
 const partyMembers = [
@@ -68,15 +69,12 @@ const partyMembers = [
 const dungeon = {
 
 	setup(){
-
 		const parseMap = () => {
-
 			currentTileMap.layers[0].data.forEach((cell, i) => {
 				if(i % 21 == 0) map.push([]);
 				cell = String(cell);
 				map[map.length - 1].push(cell);
 			});
-
 			console.log('map is ' + map[0].length + 'x' + map.length);
 			map.forEach((row, i) => {
 				map[i] = row.reduce((res, current, index, array) => {
@@ -88,14 +86,10 @@ const dungeon = {
 			map = map.reduce((res, current, index, array) => {
 				return res.concat([current, current]);
 			}, []);
-
-			console.log(map);
-
 		}, controls = () => {
-			let canMove = true;
 			const keysDown = e => {
 				if(canMove){
-					// canMove = false;
+					canMove = false;
 					switch(e.which){
 						case 38: forward(); break;
 						case 37: turnLeft(); break;
@@ -105,11 +99,9 @@ const dungeon = {
 						// case 8: back(); break;
 					};
 				}
-			}, keysUp = () => {
-				// setTimeout(() => {canMove = true;}, moveTime);
-				// canMove = true;
-			}, forward = () => {
-				moveForwardTimer = 0;
+			}, keysUp = () => {},
+			forward = () => {
+				moveTimer = 0;
 				currentSteps++;
 				if(currentSteps == randomEncounterSteps){
 					inBattle = true;
@@ -121,12 +113,10 @@ const dungeon = {
 			}, turnLeft = () => { turnLeftTimer = 0;
 			};
 			document.addEventListener('keydown', keysDown);
-			document.addEventListener('keyup', keysUp);
+			// document.addEventListener('keyup', keysUp);
 		};
-
 		parseMap();
 		controls();
-
 	},
 
 	loop(){
@@ -158,9 +148,19 @@ const dungeon = {
 					}
 				},
 				wall = () => {
-					const cameraX = 2 * column / rayWidth - 1, rayPosition = {x: position.x, y: position.y}, sideDist = {x: 0, y: 0}, step = {x: 0, y: 0};
-						rayDirection = {x: direction.x + plane.x * cameraX, y: direction.y + plane.y * cameraX};
-					const mapPosition = {x: rayPosition.x, y: rayPosition.y}, deltaDist = {
+					const cameraX = 2 * column / rayWidth - 1,
+						rayPosition = {x: position.x, y: position.y},
+						sideDist = {x: 0, y: 0},
+						step = {x: 0, y: 0};
+						rayDirection = {
+							x: direction.x + plane.x * cameraX,
+							y: direction.y + plane.y * cameraX
+						};
+					const mapPosition = {
+						x: parseInt(rayPosition.x),
+						y: parseInt(rayPosition.y)
+					},
+					deltaDist = {
 						x: Math.sqrt(1 + (rayDirection.y * rayDirection.y) / (rayDirection.x * rayDirection.x)),
 						y: Math.sqrt(1 + (rayDirection.x * rayDirection.x) / (rayDirection.y * rayDirection.y))
 					};
@@ -191,29 +191,29 @@ const dungeon = {
 						}
 						if(map[mapPosition.y] && acceptedTiles.indexOf(map[mapPosition.y][mapPosition.x]) == -1) hit = 1;
 					}
-					perpWallDist = side == 0 ? Math.abs((mapPosition.x - rayPosition.x + (1 - step.x) / 2) / rayDirection.x) :
-						perpWallDist = Math.abs((mapPosition.y - rayPosition.y + (1 - step.y) / 2) / rayDirection.y);
-					const lineHeight = Math.abs((rayHeight / perpWallDist) | 0);
+					perpWallDist = side == 0 ? (mapPosition.x - rayPosition.x + (1 - step.x) / 2) / rayDirection.x :
+						perpWallDist = (mapPosition.y - rayPosition.y + (1 - step.y) / 2) / rayDirection.y;
+					const lineHeight = (rayHeight / perpWallDist) | 0;
+
 					let drawStart = -lineHeight / 2 + rayHeight / 2;
 					if(drawStart < 0) drawStart = 0;
-					let wallTexture = bricks1WallImage, textureSize = grid * 4;
+					let drawEnd = lineHeight / 2 + rayHeight / 2;
+					if(drawEnd >= rayHeight) drawEnd = rayHeight - 1;
 
-					const texNum = map[mapPosition.y][mapPosition.x];
-
-					let wallX = side == 0 ? rayPosition.y + perpWallDist * rayDirection.y : rayPosition.x + perpWallDist * rayDirection.x;
+					let wallTexture = bricks1WallImage, textureSize = grid * 4,
+						wallX = side == 0 ? rayPosition.y + perpWallDist * rayDirection.y : rayPosition.x + perpWallDist * rayDirection.x;
 					wallX -= Math.floor(wallX);
-
 					let texX = wallX * textureSize;
 					if(side == 0 && rayDirection.x > 0) texX = textureSize - texX - 1;
 					if(side == 1 && rayDirection.y < 0) texX = textureSize - texX - 1;
-
-					switch(texNum){
+					switch(map[mapPosition.y][mapPosition.x]){
 						case '1':
 							wallTexture = bricks1WallImage;
 							break;
 					}
 
-					context.drawImage(wallTexture, texX, 0, 1, textureSize, column, drawStart, 2, lineHeight);
+					context.drawImage(wallTexture, texX, 0, 1, textureSize, column, drawStart, 1, lineHeight);
+
 					if(side == 0){
 						context.save();
 						context.globalAlpha = 0.2;
@@ -221,27 +221,56 @@ const dungeon = {
 						context.restore();
 					}
 
-					// shadow
-					// if(lineHeight <= rayHeight / 2){
-					// 	context.save();
-					// 	context.globalAlpha = (rayHeight / 2 - lineHeight) / 100;
-					// 	drawRect(column, drawStart, 1, lineHeight, 'black');
-					// 	context.restore();
-					// }
 
-					// vines
-					// context.save();
-					// context.globalAlpha = 0.67;
-					// context.drawImage(vineTexture, texX, 0, 1, textureSize, column, drawStart - 2, 1, lineHeight + 4);
-					// context.restore();
+
+					// floor casting
+					const floorWall = {x: 0, y: 0}, floorTextureSize = 16;
+
+					// 4 different wall directions possible
+					if(side == 0 && rayDirection.x > 0){
+						floorWall.x = mapPosition.x;
+						floorWall.y = mapPosition.y + wallX;
+					} else if(side == 0 && rayDirection.x < 0){
+						floorWall.x = mapPosition.x + 1;
+						floorWall.y = mapPosition.y + wallX;
+					} else if(side == 1 && rayDirection.y > 0){
+						floorWall.x = mapPosition.x + wallX;
+						floorWall.y = mapPosition.y;
+					} else {
+						floorWall.x = mapPosition.x + wallX;
+						floorWall.y = mapPosition.y + 1;
+					}
+
+					let distWall = perpWallDist, distPlayer = 0, currentDist;
+					if(drawEnd < 0) drawEnd = rayHeight;
+
+					for(var j = drawEnd + 1; j < rayHeight; j++){
+							currentDist = rayHeight / (2 * j - rayHeight);
+
+							const weight = (currentDist - distPlayer) / (distWall - distPlayer);
+							const currentFloor = {
+								x: weight * floorWall.x + (1 - weight) * position.x,
+								y: weight * floorWall.y + (1 - weight) * position.y
+							};
+							const floorTex = {
+								x: parseInt(currentFloor.x * floorTextureSize) % floorTextureSize,
+								y: parseInt(currentFloor.y * floorTextureSize) % floorTextureSize
+							};
+
+							context.drawImage(floor1Image, floorTex.x, floorTex.y, 1, 1, column, j, 1, 1); // floor
+							context.drawImage(floor1Image, floorTex.x, floorTex.y, 1, 1, column, rayHeight - j - 1, 1, 1); // ceiling
+					}
 
 				};
+
 				ceiling();
-				floor();
+				// floor();
 				while(column < rayWidth){
+					// if(column % 2 == 0)
 					wall();
 					column++;
 				}
+
 			},
 
 			chrome = () => {
@@ -254,7 +283,8 @@ const dungeon = {
 				},
 
 				minimap = () => {
-					const mapSize = gameHeight - rayHeight - 1 - grid / 2, mapY = rayHeight + 1 + grid / 4, mapX = grid / 4;
+					const mapSize = gameHeight - rayHeight - 1 - grid / 2, mapY = rayHeight + 1 + grid / 4, mapX = grid / 4,
+					mapPos = {x: parseInt(position.x), y: parseInt(position.y)};
 					const frame = () => {
 						drawRect(mapX, mapY, mapSize + 1, mapSize + 1, colorsNewer[0]); // bg border
 						drawRect(mapX + 1, mapY + 1, mapSize - 1, mapSize - 1, colorsNewer[1]); // bg
@@ -268,10 +298,10 @@ const dungeon = {
 							row.forEach((grid, x) => {
 								const xOffset = 2 * (x + 1), yOffset = 2 * (y + 1);
 								if(grid == '2'){
-									if((x == position.x && y == position.y) ||
-										(x + 1 == position.x && y == position.y) ||
-										(x == position.x && y + 1 == position.y) ||
-										(x + 1 == position.x && y + 1 == position.y)){
+									if((x == mapPos.x && y == mapPos.y) ||
+										(x + 1 == mapPos.x && y == mapPos.y) ||
+										(x == mapPos.x && y + 1 == mapPos.y) ||
+										(x + 1 == mapPos.x && y + 1 == mapPos.y)){
 										drawRect(mapX + xOffset, mapY + yOffset, 2, 2, activeColor);
 									} else {
 										drawRect(mapX + xOffset, mapY + yOffset, 2, 2, gridColor);
@@ -292,87 +322,80 @@ const dungeon = {
 
 			},
 
-			moveForward = () => {
-				if(moveForwardTimer < 2){
+			controlAnimations = {
 
-					const canPass = input => {
-						return acceptedTiles.indexOf(input) > -1 ? true : false;
-					};
-
-					const forwardTime = 1;
-					let newDirX = Math.round(direction.x * 100), newDirY = Math.round(direction.y * 100);
-					newDirX = newDirX / 100;
-					newDirY = newDirY / 100;
-					if(newDirX == 0.5 && newDirY == 0){ // east
-
-						// if(map[position.x + direction.y * forwardTime] && (map[position.x + direction.y * forwardTime][position.y])){
-						// 	const newPos = direction.x * forwardTime;
-						// 	console.log(newPos)
-						// 	position.x += direction.x * 1;
-						// }
-
-
-						// if(worldMap[(posX + dirX * moveSpeed) | 0][posY | 0] == 0) posX += dirX * moveSpeed;
-
-						if(canPass(map[position.y][position.x + 1]) && canPass(map[position.y - 1][position.x + 1])) position.x += forwardTime;
-
-						// console.log(position.x + direction.x * forwardTime)
-
-						// if(canPass(map[position.y][position.x + direction.x * forwardTime])) position.x += forwardTime;
-
+				moveForward(){
+					if(moveTimer < moveTime){
+						const moveForwardTime = 0.125;
+						if(map[parseInt(position.y)] &&
+							(map[parseInt(position.y)][parseInt(position.x + direction.x * (moveForwardTime * 16))] &&
+							(acceptedTiles.indexOf(map[parseInt(position.y)][parseInt(position.x + direction.x * (moveForwardTime * 16))]) > -1))) {
+							position.x += direction.x * moveForwardTime;
 					}
-					else if(newDirX == -0.5 && newDirY == 0){ // west
-						if(canPass(map[position.y][position.x - 2]) && canPass(map[position.y - 1][position.x - 2])) position.x -= forwardTime;
+						if(map[parseInt(position.y + direction.y * (moveForwardTime * 16))] &&
+							(map[parseInt(position.y + direction.y * (moveForwardTime * 16))][parseInt(position.x)] &&
+							(acceptedTiles.indexOf(map[parseInt(position.y + direction.y * (moveForwardTime * 16))][parseInt(position.x)]) > -1))) position.y += direction.y * moveForwardTime;
+					} else if(moveTimer == moveTime){
+						position.x = parseInt(position.x);
+						position.y = parseInt(position.y);
+						if(position.x % 2 == 0) position.x++;
+						if(position.y % 2 == 0) position.y++;
+						canMove = true;
 					}
-					else if(newDirX == 0 && newDirY == 0.5){ // south
-						if(canPass(map[position.y + 1][position.x]) && canPass(map[position.y + 1][position.x - 1])) position.y += forwardTime;
+					moveTimer++;
+				},
+
+				turnRight(){
+					if(turnRightTimer < moveTime){
+						const oldDirX = direction.x, oldPlaneX = plane.x;
+						direction.x = direction.x * Math.cos(rotateSpeed) - direction.y * Math.sin(rotateSpeed);
+						direction.y = oldDirX * Math.sin(rotateSpeed) + direction.y * Math.cos(rotateSpeed);
+						plane.x = plane.x * Math.cos(rotateSpeed) - plane.y * Math.sin(rotateSpeed);
+						plane.y = oldPlaneX * Math.sin(rotateSpeed) + plane.y * Math.cos(rotateSpeed);
+					} else if(turnRightTimer == moveTime) {
+						canMove = true;
 					}
-					else if(newDirX == 0 && newDirY == -0.5){ // north
-						if(canPass(map[position.y - 2][position.x]) && canPass(map[position.y - 2][position.x - 1])) position.y -= forwardTime;
-					} 
-				}
-				moveForwardTimer++;
-			}
+					turnRightTimer++;
+				},
 
-			turnRight = () => {
-				if(turnRightTimer < moveTime){
-					const oldDirX = direction.x, oldPlaneX = plane.x;
-					direction.x = direction.x * Math.cos(rotateSpeed) - direction.y * Math.sin(rotateSpeed);
-					direction.y = oldDirX * Math.sin(rotateSpeed) + direction.y * Math.cos(rotateSpeed);
-					plane.x = plane.x * Math.cos(rotateSpeed) - plane.y * Math.sin(rotateSpeed);
-					plane.y = oldPlaneX * Math.sin(rotateSpeed) + plane.y * Math.cos(rotateSpeed);
-				}
-				turnRightTimer++;
-			},
+				turnLeft(){
+					if(turnLeftTimer < moveTime){
+						const oldDirX = direction.x, oldPlaneX = plane.x;
+						direction.x = direction.x * Math.cos(-rotateSpeed) - direction.y * Math.sin(-rotateSpeed);
+						direction.y = oldDirX * Math.sin(-rotateSpeed) + direction.y * Math.cos(-rotateSpeed);
+						plane.x = plane.x * Math.cos(-rotateSpeed) - plane.y * Math.sin(-rotateSpeed);
+						plane.y = oldPlaneX * Math.sin(-rotateSpeed) + plane.y * Math.cos(-rotateSpeed);
+					} else if(turnLeftTimer == moveTime) {
+						canMove = true;
+					}
+					turnLeftTimer++;
+				},
 
-			turnLeft = () => {
-				if(turnLeftTimer < moveTime){
-					const oldDirX = direction.x, oldPlaneX = plane.x;
-					direction.x = direction.x * Math.cos(-rotateSpeed) - direction.y * Math.sin(-rotateSpeed);
-					direction.y = oldDirX * Math.sin(-rotateSpeed) + direction.y * Math.cos(-rotateSpeed);
-					plane.x = plane.x * Math.cos(-rotateSpeed) - plane.y * Math.sin(-rotateSpeed);
-					plane.y = oldPlaneX * Math.sin(-rotateSpeed) + plane.y * Math.cos(-rotateSpeed);
-				}
-				turnLeftTimer++;
-			},
+				turnAround(){
+					if(turnAroundTimer < moveTime){
+						const oldDirX = direction.x, oldPlaneX = plane.x;
+						direction.x = direction.x * Math.cos(rotateSpeed * 2) - direction.y * Math.sin(rotateSpeed * 2);
+						direction.y = oldDirX * Math.sin(rotateSpeed * 2) + direction.y * Math.cos(rotateSpeed * 2);
+						plane.x = plane.x * Math.cos(rotateSpeed * 2) - plane.y * Math.sin(rotateSpeed * 2);
+						plane.y = oldPlaneX * Math.sin(rotateSpeed * 2) + plane.y * Math.cos(rotateSpeed * 2);
+					} else if(turnAroundTimer == moveTime) {
+						canMove = true;
+					}
+					turnAroundTimer++;
+				},
 
-			turnAround = () => {
-				if(turnAroundTimer < moveTime * 2){
-					const oldDirX = direction.x, oldPlaneX = plane.x;
-					direction.x = direction.x * Math.cos(rotateSpeed) - direction.y * Math.sin(rotateSpeed);
-					direction.y = oldDirX * Math.sin(rotateSpeed) + direction.y * Math.cos(rotateSpeed);
-					plane.x = plane.x * Math.cos(rotateSpeed) - plane.y * Math.sin(rotateSpeed);
-					plane.y = oldPlaneX * Math.sin(rotateSpeed) + plane.y * Math.cos(rotateSpeed);
+				init(){
+					controlAnimations.moveForward();
+					controlAnimations.turnRight();
+					controlAnimations.turnLeft();
+					controlAnimations.turnAround();
 				}
-				turnAroundTimer++;
+
 			};
 
 			raycast();
 			chrome();
-			moveForward();
-			turnRight();
-			turnLeft();
-			turnAround();
+			controlAnimations.init();
 
 		};
 
