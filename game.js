@@ -427,7 +427,7 @@ const dungeon = {
 		const draw = () => {
 
 			const raycast = () => {
-				let column = 0, columnTextureCount = 0;
+				let column = 0;
 				const ceiling = () => {
 					const ceilingColor = colorsNewer[1], shadowColor = colorsNewer[0];
 					drawRect(0, 0, gameWidth, rayHeight / 2, ceilingColor);
@@ -489,54 +489,51 @@ const dungeon = {
 					const lineHeight = Math.abs((rayHeight / perpWallDist) | 0);
 					let drawStart = -lineHeight / 2 + rayHeight / 2;
 					if(drawStart < 0) drawStart = 0;
-					let wallTexture = bricks1WallImage, textureHeight = grid * 4;
-					switch(map[mapPosition.y][mapPosition.x]){
+					let wallTexture = bricks1WallImage, textureSize = grid * 4;
+
+					const texNum = map[mapPosition.y][mapPosition.x];
+
+					let wallX = side == 0 ? rayPosition.y + perpWallDist * rayDirection.y : rayPosition.x + perpWallDist * rayDirection.x;
+					wallX -= Math.floor(wallX);
+
+					let texX = wallX * textureSize;
+					if(side == 0 && rayDirection.x > 0) texX = textureSize - texX - 1;
+					if(side == 1 && rayDirection.y < 0) texX = textureSize - texX - 1;
+
+					switch(texNum){
 						case '1':
 							wallTexture = bricks1WallImage;
 							break;
-						// case '2':
-						// 	wallTexture = door2Image;
-						// 	break;
-						// case '3':
-						// 	wallTexture = door1Image;
-						// 	break;
 					}
-					// if(lineHeight >= grid / 2){
 
-						let diff = 0;
-						if(column < gameWidth / 2){
-							diff = gameWidth / 2 - (gameWidth / 2 - column);
-							diff = Math.floor(diff / 10);
-							// diff = (diff / (gameWidth / 2)) * 10;
-						} else {
-							diff = 0;
-						}
-
-						// if(gameClock < 1) console.log(columnTextureCount)
-						if(gameClock < 1) {
-							// console.log(diff)
-						}
-
-						context.drawImage(wallTexture, columnTextureCount, 0, 1, textureHeight, column, drawStart, 1, lineHeight);
-						if(lineHeight <= rayHeight / 2){
-							context.save();
-							context.globalAlpha = (rayHeight / 2 - lineHeight) / 100;
-							drawRect(column, drawStart, 1, lineHeight, 'black');
-							context.restore();
-						}
+					context.drawImage(wallTexture, texX, 0, 1, textureSize, column, drawStart, 2, lineHeight);
+					if(side == 0){
 						context.save();
-						context.globalAlpha = 0.67;
-						context.drawImage(vineTexture, columnTextureCount, 0, 1, textureHeight, column, drawStart - 4, 1, lineHeight + 8);
+						context.globalAlpha = 0.2;
+						drawRect(column, drawStart, 2, lineHeight, 'black')
 						context.restore();
+					}
+
+					// shadow
+					// if(lineHeight <= rayHeight / 2){
+					// 	context.save();
+					// 	context.globalAlpha = (rayHeight / 2 - lineHeight) / 100;
+					// 	drawRect(column, drawStart, 1, lineHeight, 'black');
+					// 	context.restore();
 					// }
+
+					// vines
+					// context.save();
+					// context.globalAlpha = 0.67;
+					// context.drawImage(vineTexture, texX, 0, 1, textureSize, column, drawStart - 2, 1, lineHeight + 4);
+					// context.restore();
+
 				};
 				ceiling();
 				floor();
 				while(column < rayWidth){
 					wall();
 					column++;
-					columnTextureCount++;
-					if(columnTextureCount >= grid * 4) columnTextureCount = 0;
 				}
 			},
 
