@@ -4,6 +4,8 @@ const position = {x: 5, y: 3},
 	plane = {x: 0, y: 1},
 	rayHeight = gameHeight - grid * 6,
 	rayWidth = gameWidth,
+	wallTextureSize = 64,
+	images = [],
 	treeWallImage = new Image(),
 	bricks1WallImage = new Image(),
 	door1Image = new Image(),
@@ -20,51 +22,71 @@ floor1Image.src = 'img/floor1.png';
 
 const bricks1WallImageHeight = grid, bricks1WallImageWidth = grid;
 
-// let map = [
-// 	['1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1'],
-// 	['1','.','2','.','.','.','.','.','2','.','.','.','.','.','1','.','2','.','1','.','1'],
-// 	['1','1','1','.','1','1','1','1','1','.','1','1','1','.','1','1','1','.','1','.','1'],
-// 	['1','.','.','.','1','1','1','.','.','.','1','.','1','.','2','.','1','.','1','.','1'],
-// 	['1','.','1','1','1','1','1','2','1','1','1','2','1','1','1','1','1','.','1','2','1'],
-// 	['1','.','1','.','.','.','1','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-// 	['1','.','1','1','1','.','1','.','1','1','1','1','1','2','1','2','1','.','1','1','1'],
-// 	['1','.','1','.','2','.','1','.','2','.','.','1','.','.','1','.','1','.','2','.','1'],
-// 	['1','.','1','1','1','.','1','.','1','1','1','1','1','1','1','1','1','.','1','1','1'],
-// 	['1','.','1','.','.','.','1','.','.','.','1','.','2','.','.','.','.','.','1','.','1'],
-// 	['1','.','1','1','1','.','1','.','1','1','1','1','1','1','1','1','1','.','1','.','1'],
-// 	['1','.','.','.','2','.','1','.','2','.','1','.','.','.','1','.','2','.','1','.','1'],
-// 	['1','1','1','1','1','1','1','.','1','1','1','1','2','1','1','1','1','.','1','2','1'],
-// 	['1','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-// 	['1','1','1','1','1','1','1','.','1','2','1','1','1','.','1','2','1','1','1','2','1'],
-// 	['1','.','.','.','.','.','1','.','1','.','1','.','2','.','1','.','1','1','1','.','1'],
-// 	['1','2','1','2','1','.','1','.','1','1','1','1','1','.','1','1','1','1','1','1','1'],
-// 	['1','.','1','.','1','.','2','.','1','.','.','.','1','.','2','.','1','.','1','.','1'],
-// 	['1','.','1','.','1','.','1','.','1','1','2','1','1','.','1','1','1','2','1','2','1'],
-// 	['1','.','1','.','1','.','1','.','.','.','.','.','.','.','.','.','.','.','.','.','1'],
-// 	['1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1']
-// ];
-
 let map = [], currentTileMap = TileMaps.map;
-
-// position.x = Math.round(map[0].length / 2) + 10;
-// position.y = Math.round(map.length / 2) + 10;
 
 const moveTime = 32, acceptedTiles = ['.', '2', '3']
 
 const rotateSpeed = (Math.PI / moveTime) / 2, randomEncounterSteps = 10;
 
-let turnRightTimer = moveTime, turnLeftTimer = moveTime, moveTimer = moveTime + 1, turnAroundTimer = moveTime * 2, canMove = true,
-	currentSteps = 0, inBattle = false;
+let turnRightTimer = moveTime, turnLeftTimer = moveTime, moveTimer = moveTime + 1, turnAroundTimer = moveTime * 2, canMove = true, texture, currentSteps = 0, inBattle = false;
 
-const partyMembers = [
-	{
-		name: 'boddy'
-	}, {
-		name: 'bala'
-	}, {
-		name: 'kilo'
+// begin texture engine
+
+const loadTexture = id => {
+	const canvas = document.createElement('canvas'), image = document.getElementById(id);
+	canvas.width = image.width;
+	canvas.height = image.height;
+	const ctx = canvas.getContext('2d');
+	ctx.drawImage(image, 0, 0);
+	const imageData = ctx.getImageData(0, 0, image.width, image.height),
+		rgbArray = new Array(image.width * image.height);
+	for(var i = 0; i < image.width * image.height; i++){
+		rgbArray[i] = [imagedata.data[4 * i], imagedata.data[4 * i + 1], imagedata.data[4 * i + 2]];
 	}
-];
+}, initTextureLoad = (textures, success) => {
+	let counter = 0;
+	const callback = () => {
+		counter++;
+		console.log(counter + ' of ' + textures.length + ' textures recieved');
+		if(counter == textures.length) success();
+	}
+	textures.forEach(texture => {
+		const image = new Image();
+		image.onload = callback;
+		image.src = texture;
+		images.push(image);
+	});
+}, getTextures = () => {
+	const textures = [];
+	images.forEach(image => {
+		const canvas = document.createElement('canvas');
+		canvas.width = image.width;
+		canvas.height = image.height;
+		const ctx = canvas.getContext('2d');
+		ctx.drawImage(image, 0, 0);
+		const imageData = ctx.getImageData(0, 0, image.width, image.height),
+			rgbArray = new Array(image.width * image.height);
+		for(var j = 0; j < image.width * image.height; j++){
+			rgbArray[j] = [imageData.data[4 * j], imageData.data[4 * j + 1], imageData.data[4 * j + 2]];
+		}
+		textures.push(rgbArray);
+	});
+	return textures;
+}, initTexture = () => {
+	texture = getTextures();
+	console.log(texture);
+	texture.push([]);
+	for(var x = 0; x < textureSize; x++){
+		for(var y = 0; y < textureSize; y++){
+			const xorColor = (x * 256 / textureSize) ^ (y * 256 / textureSize),
+				d = Math.sqrt((textureSize / 2 - x) * (textureSize / 2 - x) + (textureSize / 2 - y) * (textureSize / 2 - y));
+			const sinColor = 256 * (1 + Math.sin(d / 2)) / 2;
+			texture[3][textureSize * y + x] = [xorColor, 0, sinColor];
+		}
+	}
+};
+
+// end texture engine
 
 const dungeon = {
 
@@ -106,7 +128,6 @@ const dungeon = {
 				if(currentSteps == randomEncounterSteps){
 					inBattle = true;
 					currentSteps = 0;
-					// alert('In battle lol.')
 				}
 			}, turnAround = () => { turnAroundTimer = 0;
 			}, turnRight = () => { turnRightTimer = 0;
