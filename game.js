@@ -465,7 +465,6 @@ const dungeon = {
 						Math.abs((mapPosition.y - rayPosition.y + (1 - step.y) / 2) / rayDirection.y);
 					const lineHeight = Math.abs((rayHeight / perpWallDist) | 0);
 
-
 					let drawStart = ((rayHeight - lineHeight) / 2) | 0;
 					if(drawStart < 0)  drawStart = 0;
 					let drawEnd = ((rayHeight + lineHeight) / 2) | 0;
@@ -513,10 +512,8 @@ const dungeon = {
 						}
 					}
 
-					// floor casting
 					const floorWall = {x: 0, y: 0}, floorTexture = texture[1], ceilingTexture = texture[2];
 
-					// 4 different wall directions possible
 					if(side == 0 && rayDirection.x > 0){
 						floorWall.x = mapPosition.x;
 						floorWall.y = mapPosition.y + wallX;
@@ -624,7 +621,6 @@ const dungeon = {
 					column++;
 				}
 
-
 				context.putImageData(imageData, 0, 0);
 				drawSprite();
 
@@ -676,8 +672,12 @@ const dungeon = {
 				},
 
 				party = () => {
-					drawRect(chromeHeight + 1, rayHeight + chromeHeight / 3, gameWidth - chromeHeight - 1, 1, colorsNewer[0]);
-					drawRect(chromeHeight + 1, rayHeight + (chromeHeight / 3) * 2, gameWidth - chromeHeight - 1, 1, colorsNewer[0]);
+					partyData.forEach((partyMember, i) => {
+						if(gameClock < 1) console.log(partyMember)
+						const yOffset = rayHeight + ((chromeHeight / 3) * i);
+						if(i > 0) drawRect(chromeHeight + 1, yOffset, gameWidth - chromeHeight - 1, 1, colorsNewer[0]);
+						drawString(partyMember.name, chromeHeight + 1 + grid / 2, yOffset + (grid / 4) * 3); // string
+					});
 				};
 
 				background();
