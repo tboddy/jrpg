@@ -1,96 +1,31 @@
-const position = {x: 5, y: 3},
+const position = {x: 13, y: 3},
 	lastPosition = {x: false, y: false},
 	direction = {x: 0.5, y: 0.0},
 	plane = {x: 0, y: 1},
 	rayHeight = gameHeight - grid * 6,
-	rayWidth = gameWidth,
-	wallTextureSize = 64,
-	images = [],
-	treeWallImage = new Image(),
-	bricks1WallImage = new Image(),
-	door1Image = new Image(),
-	door2Image = new Image(),
-	vineTexture = new Image(),
-	floor1Image = new Image();
+	rayWidth = gameWidth;
 
-treeWallImage.src = 'img/trees.png';
-bricks1WallImage.src = 'img/bricks1.png';
-door1Image.src = 'img/door1.png';
-door2Image.src = 'img/door2.png';
-vineTexture.src = 'img/vines.png';
-floor1Image.src = 'img/floor1.png';
+const chimeraImage = new Image(),
+	knightImage = new Image();
+chimeraImage.src = 'img/chimera.png';
+knightImage.src = 'img/knight.png';
 
-const bricks1WallImageHeight = grid, bricks1WallImageWidth = grid;
+let map = [], currentTileMap = TileMaps.map, texture = [];
 
-let map = [], currentTileMap = TileMaps.map;
-
-const moveTime = 32, acceptedTiles = ['.', '2', '3']
+const moveTime = 32, acceptedTiles = ['.', '2', '3'],
+	spriteTiles = [
+		{tile: 3, image: knightImage, action: 'talk'}
+	];
 
 const rotateSpeed = (Math.PI / moveTime) / 2, randomEncounterSteps = 10;
 
-let turnRightTimer = moveTime, turnLeftTimer = moveTime, moveTimer = moveTime + 1, turnAroundTimer = moveTime * 2, canMove = true, texture, currentSteps = 0, inBattle = false;
-
-// begin texture engine
-
-const loadTexture = id => {
-	const canvas = document.createElement('canvas'), image = document.getElementById(id);
-	canvas.width = image.width;
-	canvas.height = image.height;
-	const ctx = canvas.getContext('2d');
-	ctx.drawImage(image, 0, 0);
-	const imageData = ctx.getImageData(0, 0, image.width, image.height),
-		rgbArray = new Array(image.width * image.height);
-	for(var i = 0; i < image.width * image.height; i++){
-		rgbArray[i] = [imagedata.data[4 * i], imagedata.data[4 * i + 1], imagedata.data[4 * i + 2]];
-	}
-}, initTextureLoad = (textures, success) => {
-	let counter = 0;
-	const callback = () => {
-		counter++;
-		console.log(counter + ' of ' + textures.length + ' textures recieved');
-		if(counter == textures.length) success();
-	}
-	textures.forEach(texture => {
-		const image = new Image();
-		image.onload = callback;
-		image.src = texture;
-		images.push(image);
-	});
-}, getTextures = () => {
-	const textures = [];
-	images.forEach(image => {
-		const canvas = document.createElement('canvas');
-		canvas.width = image.width;
-		canvas.height = image.height;
-		const ctx = canvas.getContext('2d');
-		ctx.drawImage(image, 0, 0);
-		const imageData = ctx.getImageData(0, 0, image.width, image.height),
-			rgbArray = new Array(image.width * image.height);
-		for(var j = 0; j < image.width * image.height; j++){
-			rgbArray[j] = [imageData.data[4 * j], imageData.data[4 * j + 1], imageData.data[4 * j + 2]];
-		}
-		textures.push(rgbArray);
-	});
-	return textures;
-}, initTexture = () => {
-	texture = getTextures();
-	console.log(texture);
-	texture.push([]);
-	for(var x = 0; x < textureSize; x++){
-		for(var y = 0; y < textureSize; y++){
-			const xorColor = (x * 256 / textureSize) ^ (y * 256 / textureSize),
-				d = Math.sqrt((textureSize / 2 - x) * (textureSize / 2 - x) + (textureSize / 2 - y) * (textureSize / 2 - y));
-			const sinColor = 256 * (1 + Math.sin(d / 2)) / 2;
-			texture[3][textureSize * y + x] = [xorColor, 0, sinColor];
-		}
-	}
-};
-
-// end texture engine
+let turnRightTimer = moveTime, turnLeftTimer = moveTime, moveTimer = moveTime + 1, turnAroundTimer = moveTime * 2, canMove = true, currentSteps = 0,
+	inBattle = false, spriteShowing = false, currentSprite;
 
 const dungeon = {
 
 	setup(){
+		texture = getTextures();
 		const parseMap = () => {
 			currentTileMap.layers[0].data.forEach((cell, i) => {
 				if(i % 21 == 0) map.push([]);
@@ -101,7 +36,7 @@ const dungeon = {
 			map.forEach((row, i) => {
 				map[i] = row.reduce((res, current, index, array) => {
 					let nextCurrent = current;
-					// if(current == '2') nextCurrent = '3';
+					if(current == '4') nextCurrent = '$';
 					return res.concat([current, nextCurrent]);
 				}, []);
 			});
@@ -146,29 +81,8 @@ const dungeon = {
 
 			const raycast = () => {
 				let column = 0;
-				const ceiling = () => {
-					const ceilingColor = colorsNewer[1], shadowColor = colorsNewer[0];
-					drawRect(0, 0, gameWidth, rayHeight / 2, ceilingColor);
-					for(i = 0; i < rayHeight / 2; i++){
-						context.save();
-						context.globalAlpha = i / 75;
-						drawRect(0, i, gameWidth, 1, shadowColor);
-						context.restore();
-					}
-				}, floor = () => {
-					let floorTextureCount = 0;
-					const floorColor = colorsNewer[3], shadowColor = colorsNewer[1], textureSize = 16; 
-					drawRect(0, rayHeight / 2 + 1, gameWidth, rayHeight / 2 - 1, floorColor);
-					for(i = rayHeight / 2; i < rayHeight + 1; i++){
-						let diff = (i - rayHeight / 2) / 75;
-						diff = 1 - diff;
-						context.save();
-						context.globalAlpha = diff;
-						drawRect(0, i - 1, gameWidth, 1, shadowColor);
-						context.restore();
-					}
-				},
-				wall = () => {
+
+				const drawColumn = () => {
 					const cameraX = 2 * column / rayWidth - 1,
 						rayPosition = {x: position.x, y: position.y},
 						sideDist = {x: 0, y: 0},
@@ -178,8 +92,8 @@ const dungeon = {
 							y: direction.y + plane.y * cameraX
 						};
 					const mapPosition = {
-						x: parseInt(rayPosition.x),
-						y: parseInt(rayPosition.y)
+						x: parseInt(rayPosition.x) | 0,
+						y: parseInt(rayPosition.y) | 0
 					},
 					deltaDist = {
 						x: Math.sqrt(1 + (rayDirection.y * rayDirection.y) / (rayDirection.x * rayDirection.x)),
@@ -201,51 +115,70 @@ const dungeon = {
 						sideDist.y = (mapPosition.y + 1 - rayPosition.y) * deltaDist.y;
 					}
 					while(hit == 0){
-						if(sideDist.x < sideDist.y){
+						side = sideDist.x > sideDist.y;
+						if(side == 0) {
 							sideDist.x += deltaDist.x;
 							mapPosition.x += step.x;
-							side = 0;
 						} else {
 							sideDist.y += deltaDist.y;
 							mapPosition.y += step.y;
-							side = 1;
 						}
 						if(map[mapPosition.y] && acceptedTiles.indexOf(map[mapPosition.y][mapPosition.x]) == -1) hit = 1;
 					}
-					perpWallDist = side == 0 ? (mapPosition.x - rayPosition.x + (1 - step.x) / 2) / rayDirection.x :
-						perpWallDist = (mapPosition.y - rayPosition.y + (1 - step.y) / 2) / rayDirection.y;
-					const lineHeight = (rayHeight / perpWallDist) | 0;
+					perpWallDist = side == 0 ? Math.abs((mapPosition.x - rayPosition.x + (1 - step.x) / 2) / rayDirection.x) :
+						Math.abs((mapPosition.y - rayPosition.y + (1 - step.y) / 2) / rayDirection.y);
+					const lineHeight = Math.abs((rayHeight / perpWallDist) | 0);
 
-					let drawStart = -lineHeight / 2 + rayHeight / 2;
-					if(drawStart < 0) drawStart = 0;
-					let drawEnd = lineHeight / 2 + rayHeight / 2;
+
+					let drawStart = ((rayHeight - lineHeight) / 2) | 0;
+					if(drawStart < 0)  drawStart = 0;
+					let drawEnd = ((rayHeight + lineHeight) / 2) | 0;
 					if(drawEnd >= rayHeight) drawEnd = rayHeight - 1;
 
-					let wallTexture = bricks1WallImage, textureSize = grid * 4,
-						wallX = side == 0 ? rayPosition.y + perpWallDist * rayDirection.y : rayPosition.x + perpWallDist * rayDirection.x;
+					let wallTex = texture[0], wallX = side == 0 ? rayPosition.y + perpWallDist * rayDirection.y : rayPosition.x + perpWallDist * rayDirection.x;
 					wallX -= Math.floor(wallX);
 					let texX = wallX * textureSize;
 					if(side == 0 && rayDirection.x > 0) texX = textureSize - texX - 1;
 					if(side == 1 && rayDirection.y < 0) texX = textureSize - texX - 1;
+
 					switch(map[mapPosition.y][mapPosition.x]){
 						case '1':
-							wallTexture = bricks1WallImage;
+							wallTex = texture[0];
+							break;
+						case '4':
+							wallTex = texture[3];
+							break;
+						case '$':
+							wallTex = texture[4];
 							break;
 					}
 
-					context.drawImage(wallTexture, texX, 0, 1, textureSize, column, drawStart, 1, lineHeight);
+					for(j = drawStart; j < rayHeight; j++){
+						const d = (j * 256 - rayHeight * 128 + lineHeight * 128) | 0;
+						let texY = ((d * textureSize) / (lineHeight * 256)), color;
+						if(texY < 0) texY = 0;
 
-					if(side == 0){
-						context.save();
-						context.globalAlpha = 0.2;
-						drawRect(column, drawStart, 2, lineHeight, 'black')
-						context.restore();
+						texX |= 0;
+						texY |= 0;
+						color = wallTex[textureSize * texY + texX];
+
+						let shade = (rayHeight - lineHeight) / 400
+						if(shade < 0) shade = 0;
+						shade = 1 - shade
+						if(side == 1) shade += 0.15;
+						if(shade > 1) shade = 1;
+
+						const i = 4 * (gameWidth * j) + 4 * column;
+						if(color){
+							buffer[i + 0] = color[0] * shade;
+							buffer[i + 1] = color[1] * shade;
+							buffer[i + 2] = color[2] * shade;
+							buffer[i + 3] = 255;
+						}
 					}
 
-
-
 					// floor casting
-					const floorWall = {x: 0, y: 0}, floorTextureSize = 16;
+					const floorWall = {x: 0, y: 0}, floorTexture = texture[1], ceilingTexture = texture[2];
 
 					// 4 different wall directions possible
 					if(side == 0 && rayDirection.x > 0){
@@ -265,32 +198,99 @@ const dungeon = {
 					let distWall = perpWallDist, distPlayer = 0, currentDist;
 					if(drawEnd < 0) drawEnd = rayHeight;
 
-					for(var j = drawEnd + 1; j < rayHeight; j++){
-							currentDist = rayHeight / (2 * j - rayHeight);
+					for(j = drawEnd; j < rayHeight; j++){
+						currentDist = rayHeight / (2 * j - rayHeight);
 
-							const weight = (currentDist - distPlayer) / (distWall - distPlayer);
-							const currentFloor = {
-								x: weight * floorWall.x + (1 - weight) * position.x,
-								y: weight * floorWall.y + (1 - weight) * position.y
-							};
-							const floorTex = {
-								x: parseInt(currentFloor.x * floorTextureSize) % floorTextureSize,
-								y: parseInt(currentFloor.y * floorTextureSize) % floorTextureSize
-							};
+						const weight = (currentDist - distPlayer) / (distWall - distPlayer);
+						const currentFloor = {
+							x: weight * floorWall.x + (1 - weight) * position.x,
+							y: weight * floorWall.y + (1 - weight) * position.y
+						};
+						const floorTex = {
+							x: parseInt(currentFloor.x * textureSize) % textureSize,
+							y: parseInt(currentFloor.y * textureSize) % textureSize
+						};
+						let shade = j / 120;
+						shade += 0.15;
+						if(shade > 1) shade = 1;
+						let i;
+						color = floorTexture[textureSize * (floorTex.y | 0) + (floorTex.x | 0)];
+						if(color){
+							i = 4 * (gameWidth * j) + 4 * column;
+							buffer[i+0] = color[0] * shade;
+							buffer[i+1] = color[1] * shade;
+							buffer[i+2] = color[2] * shade;
+							buffer[i+3] = 255;
+						}
 
-							context.drawImage(floor1Image, floorTex.x, floorTex.y, 1, 1, column, j, 1, 1); // floor
-							context.drawImage(floor1Image, floorTex.x, floorTex.y, 1, 1, column, rayHeight - j - 1, 1, 1); // ceiling
+						color = ceilingTexture[textureSize * (floorTex.y | 0) + (floorTex.x | 0)];
+						if(color){
+							i = 4 * (gameWidth * (rayHeight - j - 1)) + 4 * column;
+							buffer[i+0] = color[0] * shade;
+							buffer[i+1] = color[1] * shade;
+							buffer[i+2] = color[2] * shade;
+							buffer[i+3] = 255;
+						}
 					}
+				},
 
+				drawSprite = () => {
+					if(lastPosition.x != position.x || lastPosition.y != position.y){
+						lastPosition.x = position.x;
+						lastPosition.y = position.y;
+						let spriteShowingTemp = false;
+						spriteTiles.forEach(spriteTile => {
+							if(spriteTile.tile == map[parseInt(lastPosition.y)][parseInt(lastPosition.x)]){
+								spriteShowingTemp = true;
+								currentSprite = spriteTile;
+							}
+						});
+						spriteShowing = spriteShowingTemp ? true : false;
+					}
+					if(spriteShowing){
+
+						// draw the sprite
+						const spriteX = gameWidth / 2 - currentSprite.image.width / 2,
+							spriteY = (rayHeight / 2 - currentSprite.image.height / 2) + grid * 0.75;
+						context.drawImage(currentSprite.image, spriteX, spriteY);
+
+						// draw action prompt
+						if(currentSprite.action){
+							switch(currentSprite.action){
+								case 'talk':
+
+									let boxWidth = grid * 3, boxHeight = grid * 1.5; xOffset = gameWidth / 2 - boxWidth / 2, yOffset = grid * 0.5;
+									drawRect(xOffset, yOffset, boxWidth, boxHeight, colorsNewer[0]); // border
+									drawRect(xOffset + 1, yOffset + 1, boxWidth - 2, boxHeight - 2, colorsNewer[3]); // bg
+									drawRect(xOffset + 1, yOffset + 1, boxWidth - 2, 1, colorsNewer[4]); // bevel
+									drawString('talk', xOffset + grid / 2, yOffset + grid / 2); // string
+
+									// boxWidth = gameWidth - grid / 2;
+									// boxHeight = grid * 3.25;
+									// xOffset = grid / 4;
+									// yOffset = grid * 4.5;
+									// drawRect(xOffset, yOffset, boxWidth, boxHeight, colorsNewer[0]); // border
+									// drawRect(xOffset + 1, yOffset + 1, boxWidth - 2, boxHeight - 2, colorsNewer[3]); // bg
+									// drawRect(xOffset + 1, yOffset + 1, boxWidth - 2, 1, colorsNewer[4]); // bevel
+									// drawString('general moisty:', xOffset + grid / 2, yOffset + grid / 2); // string
+									// drawString('i have lost my beef coith.', xOffset + grid / 2, yOffset + grid / 2 + grid); // string
+									// drawString('can you reclaim my coith ...', xOffset + grid / 2, yOffset + grid / 2 + grid * 1.75); // string
+
+									break;
+							}
+						}
+
+					}
 				};
 
-				ceiling();
-				// floor();
 				while(column < rayWidth){
-					// if(column % 2 == 0)
-					wall();
+					drawColumn();
 					column++;
 				}
+
+
+				context.putImageData(imageData, 0, 0);
+				drawSprite();
 
 			},
 
@@ -318,7 +318,7 @@ const dungeon = {
 						map.forEach((row, y) => {
 							row.forEach((grid, x) => {
 								const xOffset = 2 * (x + 1), yOffset = 2 * (y + 1);
-								if(grid == '2'){
+								if(acceptedTiles.indexOf(grid) > -1){
 									if((x == mapPos.x && y == mapPos.y) ||
 										(x + 1 == mapPos.x && y == mapPos.y) ||
 										(x == mapPos.x && y + 1 == mapPos.y) ||
