@@ -296,11 +296,12 @@ const dungeon = {
 
 			chrome = () => {
 
-				const bgColor = colorsNewer[3], bevelColor = colorsNewer[4];
+				const bgColor = colorsNewer[3], bevelColor = colorsNewer[4], chromeHeight = gameHeight - rayHeight;
 
 				const background = () => {
 					drawRect(0, rayHeight + 1, gameWidth, gameHeight - rayHeight - 1, bgColor); // bg
 					drawRect(0, rayHeight + 1, gameWidth, 1, bevelColor); // bevel
+					drawRect(chromeHeight, rayHeight, 1, chromeHeight, colorsNewer[0]) // divider
 				},
 
 				minimap = () => {
@@ -336,10 +337,16 @@ const dungeon = {
 					};
 					frame();
 					tiles();
+				},
+
+				party = () => {
+					drawRect(chromeHeight + 1, rayHeight + chromeHeight / 3, gameWidth - chromeHeight - 1, 1, colorsNewer[0]);
+					drawRect(chromeHeight + 1, rayHeight + (chromeHeight / 3) * 2, gameWidth - chromeHeight - 1, 1, colorsNewer[0]);
 				};
 
 				background();
 				minimap();
+				party();
 
 			},
 
