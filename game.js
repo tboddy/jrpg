@@ -645,10 +645,7 @@ const dungeon = {
 						drawRect(mapX + 1, mapY + 1, mapSize - 1, mapSize - 1, colorsNewer[1]); // bg
 						drawRect(mapX, mapY + mapSize + 1, mapSize + 1, 1, bevelColor);
 					}, tiles = () => {
-						let bgColor = colorsNewer[1],
-							gridColor = colorsNewer[3],
-							activeColor = colorsNewer[15],
-							doorColor = colorsNewer[14];
+						const bgColor = colorsNewer[1], gridColor = colorsNewer[3], activeColor = colorsNewer[15], doorColor = colorsNewer[14];
 						map.forEach((row, y) => {
 							row.forEach((grid, x) => {
 								const xOffset = 2 * (x + 1), yOffset = 2 * (y + 1);
@@ -658,13 +655,16 @@ const dungeon = {
 										(x == mapPos.x && y + 1 == mapPos.y) ||
 										(x + 1 == mapPos.x && y + 1 == mapPos.y)){
 										drawRect(mapX + xOffset, mapY + yOffset, 2, 2, activeColor);
+										const pushTiles = () => {
+											foundTiles.push({x: x, y: y});
+										};
 										if(foundTiles.length){
 											let canPush = true;
 											foundTiles.forEach(tile => {
 												if(tile.x == x && tile.y == y) canPush = false;
 											});
-											if(canPush) foundTiles.push({x: x, y: y});
-										} else foundTiles.push({x: x, y: y});
+											if(canPush) pushTiles();
+										} else pushTiles();
 									} else {
 										if(foundTiles.length){
 											foundTiles.forEach(tile => {
@@ -673,9 +673,6 @@ const dungeon = {
 										}
 									}
 								}
-								// else if(grid == '2'){
-								// 	drawRect(mapX + xOffset, mapY + yOffset, 4, 2, doorColor);
-								// }
 							});
 						});
 					};
