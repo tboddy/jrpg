@@ -339,7 +339,8 @@ const position = {x: 13, y: 3},
 	direction = {x: 0.5, y: 0.0},
 	plane = {x: 0, y: 1},
 	rayHeight = gameHeight - grid * 6,
-	rayWidth = gameWidth;
+	rayWidth = gameWidth,
+	foundTiles = [];
 
 const chimeraImage = new Image(),
 	knightImage = new Image();
@@ -657,8 +658,19 @@ const dungeon = {
 										(x == mapPos.x && y + 1 == mapPos.y) ||
 										(x + 1 == mapPos.x && y + 1 == mapPos.y)){
 										drawRect(mapX + xOffset, mapY + yOffset, 2, 2, activeColor);
+										if(foundTiles.length){
+											let canPush = true;
+											foundTiles.forEach(tile => {
+												if(tile.x == x && tile.y == y) canPush = false;
+											});
+											if(canPush) foundTiles.push({x: x, y: y});
+										} else foundTiles.push({x: x, y: y});
 									} else {
-										drawRect(mapX + xOffset, mapY + yOffset, 2, 2, gridColor);
+										if(foundTiles.length){
+											foundTiles.forEach(tile => {
+												if(tile.y == y && x == tile.x) drawRect(mapX + xOffset, mapY + yOffset, 2, 2, gridColor);
+											});
+										}
 									}
 								}
 								// else if(grid == '2'){
@@ -675,8 +687,19 @@ const dungeon = {
 					partyData.forEach((partyMember, i) => {
 						if(gameClock < 1) console.log(partyMember)
 						const yOffset = rayHeight + ((chromeHeight / 3) * i);
-						if(i > 0) drawRect(chromeHeight + 1, yOffset, gameWidth - chromeHeight - 1, 1, colorsNewer[0]);
-						drawString(partyMember.name, chromeHeight + 1 + grid / 2, yOffset + (grid / 4) * 3); // string
+						if(i > 0){
+							drawRect(chromeHeight + 1, yOffset, gameWidth - chromeHeight - 1, 1, colorsNewer[0]);
+							drawRect(chromeHeight + 1, yOffset + 1, gameWidth - chromeHeight - 1, 1, bevelColor);
+						}
+						drawString(partyMember.name, chromeHeight + grid / 4 + 2, yOffset + grid / 4 + 2); // name
+
+						const barWidth = grid * 4.5 - 1, barHeight = grid / 2;
+
+						drawRect(chromeHeight + grid / 4 + 2, yOffset + grid / 4 + grid - 1, barWidth, barHeight, colorsNewer[1]) // hp
+						drawRect(chromeHeight + grid / 4 + 2, yOffset + grid / 4 + grid - 1 + barHeight, barWidth, 1, bevelColor) // hp b
+
+						drawRect(chromeHeight + grid / 4 + 2 + barWidth + grid / 4 + 3, yOffset + grid / 4 + grid - 1, barWidth, barHeight, colorsNewer[1]) // mp
+						drawRect(chromeHeight + grid / 4 + 2 + barWidth + grid / 4 + 3, yOffset + grid / 4 + grid - 1 + barHeight, barWidth, 1, bevelColor) // mp b
 					});
 				};
 
