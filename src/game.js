@@ -6,7 +6,7 @@ const initTextureLoad = (textures, success) => {
 	let counter = 0;
 	const callback = () => {
 		counter++;
-		console.log(counter + ' of ' + textures.length + ' textures recieved');
+		// console.log(counter + ' of ' + textures.length + ' textures recieved');
 		if(counter == textures.length) success();
 	}
 	textures.forEach(texture => {

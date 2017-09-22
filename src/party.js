@@ -1,10 +1,12 @@
 const partyData = [
 
 	{
-		name: 'boddy',
+		name: 'Stiff and Cold Dookie Crumb',
 		active: true,
-		hp: 420,
-		mp: 95,
+		hp: 10,
+		hpMax: 14,
+		mp: 5,
+		mpMax: 10,
 		skills: [
 			{title: 'fire', info: 'light fire damage', active: true},
 			{title: 'fire 2', info: 'medium fire damage', active: false},
@@ -18,19 +20,23 @@ const partyData = [
 	},
 
 	{
-		name: 'kilodog',
+		name: 'Meaty Leaking Sock',
 		active: false,
-		hp: 380,
-		mp: 132,
+		hp: 4,
+		hpMax: 12,
+		mp: 14,
+		mpMax: 16,
 		skills: [
 		]
 	},
 
 	{
-		name: 'balacat',
+		name: 'Diarrhea Banana Vitamin',
 		active: false,
-		hp: 666,
-		mp: 23,
+		hp: 7,
+		hpMax: 14,
+		mp: 8,
+		mpMax: 8,
 		skills: [
 		]
 	}

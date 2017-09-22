@@ -33,7 +33,7 @@ const dungeon = {
 				cell = String(cell);
 				map[map.length - 1].push(cell);
 			});
-			console.log('map is ' + map[0].length + 'x' + map.length);
+			// console.log('map is ' + map[0].length + 'x' + map.length);
 			map.forEach((row, i) => {
 				map[i] = row.reduce((res, current, index, array) => {
 					let nextCurrent = current;
@@ -254,14 +254,20 @@ const dungeon = {
 
 						// draw action prompt
 						if(currentSprite.action){
+
+							const drawActionBox = string => {
+								const boxWidth = grid * 3, boxHeight = grid * 1.5;
+								const xOffset = gameWidth / 2 - boxWidth / 2, yOffset = grid * 0.5;
+								drawRect(xOffset, yOffset, boxWidth, boxHeight, colorsNewer[0]); // border
+								drawRect(xOffset + 1, yOffset + 1, boxWidth - 2, boxHeight - 2, colorsNewer[3]); // bg
+								drawRect(xOffset + 1, yOffset + 1, boxWidth - 2, 1, colorsNewer[4]); // bevel
+								drawString(string, xOffset + grid / 2, yOffset + grid / 2); // string
+							};
+
 							switch(currentSprite.action){
 								case 'talk':
 
-									let boxWidth = grid * 3, boxHeight = grid * 1.5; xOffset = gameWidth / 2 - boxWidth / 2, yOffset = grid * 0.5;
-									drawRect(xOffset, yOffset, boxWidth, boxHeight, colorsNewer[0]); // border
-									drawRect(xOffset + 1, yOffset + 1, boxWidth - 2, boxHeight - 2, colorsNewer[3]); // bg
-									drawRect(xOffset + 1, yOffset + 1, boxWidth - 2, 1, colorsNewer[4]); // bevel
-									drawString('talk', xOffset + grid / 2, yOffset + grid / 2); // string
+									drawActionBox('Talk');
 
 									// boxWidth = gameWidth - grid / 2;
 									// boxHeight = grid * 3.25;
@@ -346,21 +352,40 @@ const dungeon = {
 
 				party = () => {
 					partyData.forEach((partyMember, i) => {
-						if(gameClock < 1) console.log(partyMember)
 						const yOffset = rayHeight + ((chromeHeight / 3) * i);
 						if(i > 0){
 							drawRect(chromeHeight + 1, yOffset, gameWidth - chromeHeight - 1, 1, colorsNewer[0]);
 							drawRect(chromeHeight + 1, yOffset + 1, gameWidth - chromeHeight - 1, 1, bevelColor);
 						}
-						drawString(partyMember.name, chromeHeight + grid / 4 + 2, yOffset + grid / 4 + 2); // name
 
-						const barWidth = grid * 4.5 - 1, barHeight = grid / 2;
+						const nameOffset = yOffset + 1 + 4;
+						drawString(partyMember.name, chromeHeight + 1 + 4, nameOffset); // name
 
-						drawRect(chromeHeight + grid / 4 + 2, yOffset + grid / 4 + grid - 1, barWidth, barHeight, colorsNewer[1]) // hp
-						drawRect(chromeHeight + grid / 4 + 2, yOffset + grid / 4 + grid - 1 + barHeight, barWidth, 1, bevelColor) // hp b
+						const barWidth = grid * 4.5,
+							barHeight = grid / 2 + 5,
+							barOffset = yOffset + (grid * 1.5) - (grid / 2);
 
-						drawRect(chromeHeight + grid / 4 + 2 + barWidth + grid / 4 + 3, yOffset + grid / 4 + grid - 1, barWidth, barHeight, colorsNewer[1]) // mp
-						drawRect(chromeHeight + grid / 4 + 2 + barWidth + grid / 4 + 3, yOffset + grid / 4 + grid - 1 + barHeight, barWidth, 1, bevelColor) // mp b
+						const hpWidth = parseInt(barWidth * (partyMember.hp / partyMember.hpMax)),
+							hpOffset = chromeHeight + grid / 4 + 3 + grid + 2,
+							hpString = partyMember.hp < 10 ? '0' + String(partyMember.hp) : String(partyMember.hp);
+						drawRect(chromeHeight + 5, barOffset, barWidth + 2, barHeight, colorsNewer[0]); // hp bg
+						drawRect(chromeHeight + 6, barOffset + 1, hpWidth, barHeight - 2, colorsNewer[11]); // hp in
+						drawRect(chromeHeight + 6, barOffset + 1, hpWidth, 1, colorsNewer[10]); // hp in bev
+						drawRect(chromeHeight + 5, barOffset + barHeight, barWidth + 2, 1, bevelColor); // hp bev
+						drawString('HP', chromeHeight + 5 + 3, barOffset + 3);
+						drawString(hpString, chromeHeight + 5 + barWidth - grid / 2 - 2, barOffset + 3);
+
+						const mpWidth = parseInt(barWidth * (partyMember.mp / partyMember.mpMax)),
+							mpOffset = gameWidth - grid * 5 + 2,
+							mpString = partyMember.mp < 10 ? '0' + String(partyMember.mp) : String(partyMember.mp);
+
+						drawRect(mpOffset, barOffset, barWidth + 2, barHeight, colorsNewer[0]); // mp bg
+						drawRect(mpOffset + 1, barOffset + 1, mpWidth, barHeight - 2, colorsNewer[15]); // mp in
+						drawRect(mpOffset + 1, barOffset + 1, mpWidth, 1, colorsNewer[9]); // mp in bev
+						drawRect(mpOffset, barOffset + barHeight, barWidth + 2, 1, bevelColor); // mp bev
+						drawString('MP', mpOffset + 3, barOffset + 3);
+						drawString(mpString, mpOffset + barWidth - grid / 2 - 2, barOffset + 3);
+
 					});
 				};
 

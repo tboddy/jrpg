@@ -76,11 +76,13 @@ const bestiary = {
 
 };
 const fps = 60, canvas = document.getElementById('canvas'), canvasEl = $('canvas'), grid = 16, gameHeight = 224, gameWidth = 256,
-	browserWindow = require('electron').remote, storage = require('electron-json-storage'), analogThresh = 0.15, charImg = new Image();
+	browserWindow = require('electron').remote, storage = require('electron-json-storage'), analogThresh = 0.15, charImg = new Image(),
+	fontImage = new Image();
 const context = canvas.getContext('2d'), mainWindow = browserWindow.getCurrentWindow();
 let gamepad = false, savedData = {}, startedGame = false, isFullscreen = false, loop, canGetHit = true;
 
 charImg.src = 'img/font.png';
+fontImage.src = 'img/font2.png';
 
 const colors = {
 	// medium: '#8b8b8b',
@@ -160,61 +162,369 @@ drawRect = (x, y, width, height, color) => {
 	context.fill();
 },
 
-drawString = (input, x, y, isRed, isDisabled) => {
+drawString = (input, x, y) => {
+	let lastX = 0, lastWidth = 0;
 	input.split('').forEach((char, i) => {
-		drawChar(char, x + (i * (grid / 2)), y, isRed, isDisabled);
+		let charX = 0, charY = 0, charWidth = 0, charHeight = 8;
+		switch(char){
+
+			// numbers and punctuation
+				case '0':
+					charWidth = 5;
+					break;
+				case '1':
+					charWidth = 4;
+					charX = 5;
+					break;
+				case '2':
+					charWidth = 5;
+					charX = 9;
+					break;
+				case '3':
+					charWidth = 4;
+					charX = 14;
+					break;
+				case '4':
+					charWidth = 6;
+					charX = 19;
+					break;
+				case '5':
+					charWidth = 5;
+					charX = 25;
+					break;
+				case '6':
+					charWidth = 5;
+					charX = 30;
+					break;
+				case '7':
+					charWidth = 5;
+					charX = 35;
+					break;
+				case '8':
+					charWidth = 5;
+					charX = 40;
+					break;
+				case '9':
+					charWidth = 5;
+					charX = 45;
+					break;
+				case '.':
+					charWidth = 2;
+					charX = 50;
+					break;
+				case ',':
+					charWidth = 3;
+					charX = 52;
+					break;
+				case '!':
+					charWidth = 2;
+					charX = 55;
+					break;
+				case ':':
+					charWidth = 2;
+					charX = 57;
+					break;
+				case ' ':
+					charWidth = 2;
+					charX = 59;
+					break;
+
+			// uppercase letters
+				case 'A':
+					charWidth = 5;
+					charY = 8;
+					break;
+				case 'B':
+					charWidth = 5;
+					charY = 8;
+					charX = 5;
+					break;
+				case 'C':
+					charWidth = 5;
+					charY = 8;
+					charX = 10;
+					break;
+				case 'D':
+					charWidth = 5;
+					charY = 8;
+					charX = 15;
+					break;
+				case 'E':
+					charWidth = 4;
+					charY = 8;
+					charX = 20;
+					break;
+				case 'F':
+					charWidth = 4;
+					charY = 8;
+					charX = 24;
+					break;
+				case 'G':
+					charWidth = 5;
+					charY = 8;
+					charX = 28;
+					break;
+				case 'H':
+					charWidth = 5;
+					charY = 8;
+					charX = 33;
+					break;
+				case 'I':
+					charWidth = 2;
+					charY = 8;
+					charX = 38;
+					break;
+				case 'J':
+					charWidth = 5;
+					charY = 8;
+					charX = 40;
+					break;
+				case 'K':
+					charWidth = 5;
+					charY = 8;
+					charX = 45;
+					break;
+				case 'L':
+					charWidth = 4;
+					charY = 8;
+					charX = 50;
+					break;
+				case 'M':
+					charWidth = 6;
+					charY = 8;
+					charX = 54;
+					break;
+				case 'N':
+					charWidth = 5;
+					charY = 8;
+					charX = 60;
+					break;
+				case 'O':
+					charWidth = 5;
+					charY = 8;
+					charX = 65;
+					break;
+				case 'P':
+					charWidth = 5;
+					charY = 8;
+					charX = 70;
+					break;
+				case 'Q':
+					charWidth = 5;
+					charY = 8;
+					charX = 75;
+					break;
+				case 'R':
+					charWidth = 5;
+					charY = 8;
+					charX = 80;
+					break;
+				case 'S':
+					charWidth = 5;
+					charY = 8;
+					charX = 85;
+					break;
+				case 'T':
+					charWidth = 6;
+					charY = 8;
+					charX = 90;
+					break;
+				case 'U':
+					charWidth = 5;
+					charY = 8;
+					charX = 96;
+					break;
+				case 'V':
+					charWidth = 6;
+					charY = 8;
+					charX = 101;
+					break;
+				case 'W':
+					charWidth = 6;
+					charY = 8;
+					charX = 107;
+					break;
+				case 'X':
+					charWidth = 5;
+					charY = 8;
+					charX = 113;
+					break;
+				case 'Y':
+					charWidth = 6;
+					charY = 8;
+					charX = 118;
+					break;
+				case 'Z':
+					charWidth = 4;
+					charY = 8;
+					charX = 124;
+					break;
+
+			// lowercase
+				case 'a':
+					charWidth = 5;
+					charX = 0;
+					charY = 16;
+					charHeight = 9;
+					break;
+				case 'b':
+					charWidth = 5;
+					charX = 5;
+					charY = 16;
+					charHeight = 9;
+					break;
+				case 'c':
+					charWidth = 4;
+					charX = 10;
+					charY = 16;
+					charHeight = 9;
+					break;
+				case 'd':
+					charWidth = 5;
+					charX = 14;
+					charY = 16;
+					charHeight = 9;
+					break;
+				case 'e':
+					charWidth = 5;
+					charX = 19;
+					charY = 16;
+					charHeight = 9;
+					break;
+				case 'f':
+					charWidth = 3;
+					charX = 23;
+					charY = 16;
+					charHeight = 9;
+					break;
+				case 'g':
+					charWidth = 5;
+					charX = 27;
+					charY = 16;
+					charHeight = 9;
+					break;
+				case 'h':
+					charWidth = 5;
+					charX = 32;
+					charY = 16;
+					charHeight = 9;
+					break;
+				case 'i':
+					charWidth = 2;
+					charX = 37;
+					charY = 16;
+					charHeight = 9;
+					break;
+				case 'j':
+					charWidth = 3;
+					charX = 39;
+					charY = 16;
+					charHeight = 9;
+					break;
+				case 'k':
+					charWidth = 5;
+					charX = 42;
+					charY = 16;
+					charHeight = 9;
+					break;
+				case 'l':
+					charWidth = 2;
+					charX = 47;
+					charY = 16;
+					charHeight = 9;
+					break;
+				case 'm':
+					charWidth = 8;
+					charX = 49;
+					charY = 16;
+					charHeight = 9;
+					break;
+				case 'n':
+					charWidth = 5;
+					charX = 57;
+					charY = 16;
+					charHeight = 9;
+					break;
+				case 'o':
+					charWidth = 5;
+					charX = 62;
+					charY = 16;
+					charHeight = 9;
+					break;
+				case 'p':
+					charWidth = 5;
+					charX = 67;
+					charY = 16;
+					charHeight = 9;
+					break;
+				case 'q':
+					charWidth = 5;
+					charX = 72;
+					charY = 16;
+					charHeight = 9;
+					break;
+				case 'r':
+					charWidth = 4;
+					charX = 77;
+					charY = 16;
+					charHeight = 9;
+					break;
+				case 's':
+					charWidth = 4;
+					charX = 81;
+					charY = 16;
+					charHeight = 9;
+					break;
+				case 't':
+					charWidth = 4;
+					charX = 85;
+					charY = 16;
+					charHeight = 9;
+					break;
+				case 'u':
+					charWidth = 5;
+					charX = 89;
+					charY = 16;
+					charHeight = 9;
+					break;
+				case 'v':
+					charWidth = 5;
+					charX = 94;
+					charY = 16;
+					charHeight = 9;
+					break;
+				case 'w':
+					charWidth = 6;
+					charX = 99;
+					charY = 16;
+					charHeight = 9;
+					break;
+				case 'x':
+					charWidth = 5;
+					charX = 105;
+					charY = 16;
+					charHeight = 9;
+					break;
+				case 'y':
+					charWidth = 5;
+					charX = 110;
+					charY = 16;
+					charHeight = 9;
+					break;
+				case 'z':
+					charWidth = 4;
+					charX = 115;
+					charY = 16;
+					charHeight = 9;
+					break;
+		
+		};
+		if(!lastX) lastX = x;
+		if(lastWidth) lastX = lastX + lastWidth;
+		lastWidth = charWidth;
+		context.drawImage(fontImage, charX, charY, charWidth, charHeight, lastX, y, charWidth, charHeight);
 	});
-},
-
-drawChar = (input, x, y, isRed, isDisabled) => {
-	let charLeft = 0, charTop = 0;
-	const size = grid / 2;
-	switch(input){
-		// case '0': charLeft = numStart; break;
-		case '1': charLeft = size; break;
-		case '2': charLeft = size * 2; break;
-		case '3': charLeft = size * 3; break;
-		case '4': charLeft = size * 4; break;
-		case '5': charLeft = size * 5; break;
-		case '6': charLeft = size * 6; break;
-		case '7': charLeft = size * 7; break;
-		case '8': charLeft = size * 8; break;
-		case '9': charLeft = size * 9; break;
-
-		case 'a': charLeft = size * 10; break;
-		case 'b': charLeft = size * 11; break;
-		case 'c': charLeft = size * 12; break;
-		case 'd': charLeft = size * 13; break;
-		case 'e': charLeft = size * 14; break;
-		case 'f': charLeft = size * 15; break;
-		case 'g': charLeft = size * 16; break;
-		case 'h': charLeft = size * 17; break;
-		case 'i': charLeft = size * 18; break;
-		case 'j': charLeft = size * 19; break;
-		case 'k': charLeft = size * 20; break;
-		case 'l': charLeft = size * 21; break;
-		case 'm': charLeft = size * 22; break;
-		case 'n': charLeft = size * 23; break;
-		case 'o': charLeft = size * 24; break;
-		case 'p': charLeft = size * 25; break;
-		case 'q': charLeft = size * 26; break;
-		case 'r': charLeft = size * 27; break;
-		case 's': charLeft = size * 28; break;
-		case 't': charLeft = size * 29; break;
-		case 'u': charLeft = size * 30; break;
-		case 'v': charLeft = size * 31; break;
-		case 'w': charLeft = size * 32; break;
-		case 'x': charLeft = size * 33; break;
-		case 'y': charLeft = size * 34; break;
-		case 'z': charLeft = size * 35; break;
-		case ':': charLeft = size * 36; break;
-		case '.': charLeft = size * 37; break;
-		case ' ': charLeft = size * 38; break;
-	};
-	if(isRed) charTop = size;
-	else if(isDisabled) charTop = size * 2;
-	context.drawImage(charImg, charLeft, charTop, size, size, x, y, size, size);
-}, 
+};
 
 getAspect = () => {
 	var newWidth = $(window).width(), newHeight = $(window).height(), remHeight = $(window).width() * 0.9375,
@@ -222,7 +532,7 @@ getAspect = () => {
 	if(newWidth >= remWidth) newWidth = remWidth;
 	else if(newHeight > remHeight) newHeight = remHeight;
 	return {width: newWidth, height: newHeight};
-};
+},
 
 isMinusZero = value => {
 	return 1 / value === -Infinity;
@@ -235,7 +545,7 @@ const initTextureLoad = (textures, success) => {
 	let counter = 0;
 	const callback = () => {
 		counter++;
-		console.log(counter + ' of ' + textures.length + ' textures recieved');
+		// console.log(counter + ' of ' + textures.length + ' textures recieved');
 		if(counter == textures.length) success();
 	}
 	textures.forEach(texture => {
@@ -289,10 +599,12 @@ gameLoop = () => {
 const partyData = [
 
 	{
-		name: 'boddy',
+		name: 'Stiff and Cold Dookie Crumb',
 		active: true,
-		hp: 420,
-		mp: 95,
+		hp: 10,
+		hpMax: 14,
+		mp: 5,
+		mpMax: 10,
 		skills: [
 			{title: 'fire', info: 'light fire damage', active: true},
 			{title: 'fire 2', info: 'medium fire damage', active: false},
@@ -306,19 +618,23 @@ const partyData = [
 	},
 
 	{
-		name: 'kilodog',
+		name: 'Meaty Leaking Sock',
 		active: false,
-		hp: 380,
-		mp: 132,
+		hp: 4,
+		hpMax: 12,
+		mp: 14,
+		mpMax: 16,
 		skills: [
 		]
 	},
 
 	{
-		name: 'balacat',
+		name: 'Diarrhea Banana Vitamin',
 		active: false,
-		hp: 666,
-		mp: 23,
+		hp: 7,
+		hpMax: 14,
+		mp: 8,
+		mpMax: 8,
 		skills: [
 		]
 	}
@@ -369,7 +685,7 @@ const dungeon = {
 				cell = String(cell);
 				map[map.length - 1].push(cell);
 			});
-			console.log('map is ' + map[0].length + 'x' + map.length);
+			// console.log('map is ' + map[0].length + 'x' + map.length);
 			map.forEach((row, i) => {
 				map[i] = row.reduce((res, current, index, array) => {
 					let nextCurrent = current;
@@ -590,14 +906,20 @@ const dungeon = {
 
 						// draw action prompt
 						if(currentSprite.action){
+
+							const drawActionBox = string => {
+								const boxWidth = grid * 3, boxHeight = grid * 1.5;
+								const xOffset = gameWidth / 2 - boxWidth / 2, yOffset = grid * 0.5;
+								drawRect(xOffset, yOffset, boxWidth, boxHeight, colorsNewer[0]); // border
+								drawRect(xOffset + 1, yOffset + 1, boxWidth - 2, boxHeight - 2, colorsNewer[3]); // bg
+								drawRect(xOffset + 1, yOffset + 1, boxWidth - 2, 1, colorsNewer[4]); // bevel
+								drawString(string, xOffset + grid / 2, yOffset + grid / 2); // string
+							};
+
 							switch(currentSprite.action){
 								case 'talk':
 
-									let boxWidth = grid * 3, boxHeight = grid * 1.5; xOffset = gameWidth / 2 - boxWidth / 2, yOffset = grid * 0.5;
-									drawRect(xOffset, yOffset, boxWidth, boxHeight, colorsNewer[0]); // border
-									drawRect(xOffset + 1, yOffset + 1, boxWidth - 2, boxHeight - 2, colorsNewer[3]); // bg
-									drawRect(xOffset + 1, yOffset + 1, boxWidth - 2, 1, colorsNewer[4]); // bevel
-									drawString('talk', xOffset + grid / 2, yOffset + grid / 2); // string
+									drawActionBox('Talk');
 
 									// boxWidth = gameWidth - grid / 2;
 									// boxHeight = grid * 3.25;
@@ -682,21 +1004,40 @@ const dungeon = {
 
 				party = () => {
 					partyData.forEach((partyMember, i) => {
-						if(gameClock < 1) console.log(partyMember)
 						const yOffset = rayHeight + ((chromeHeight / 3) * i);
 						if(i > 0){
 							drawRect(chromeHeight + 1, yOffset, gameWidth - chromeHeight - 1, 1, colorsNewer[0]);
 							drawRect(chromeHeight + 1, yOffset + 1, gameWidth - chromeHeight - 1, 1, bevelColor);
 						}
-						drawString(partyMember.name, chromeHeight + grid / 4 + 2, yOffset + grid / 4 + 2); // name
 
-						const barWidth = grid * 4.5 - 1, barHeight = grid / 2;
+						const nameOffset = yOffset + 1 + 4;
+						drawString(partyMember.name, chromeHeight + 1 + 4, nameOffset); // name
 
-						drawRect(chromeHeight + grid / 4 + 2, yOffset + grid / 4 + grid - 1, barWidth, barHeight, colorsNewer[1]) // hp
-						drawRect(chromeHeight + grid / 4 + 2, yOffset + grid / 4 + grid - 1 + barHeight, barWidth, 1, bevelColor) // hp b
+						const barWidth = grid * 4.5,
+							barHeight = grid / 2 + 5,
+							barOffset = yOffset + (grid * 1.5) - (grid / 2);
 
-						drawRect(chromeHeight + grid / 4 + 2 + barWidth + grid / 4 + 3, yOffset + grid / 4 + grid - 1, barWidth, barHeight, colorsNewer[1]) // mp
-						drawRect(chromeHeight + grid / 4 + 2 + barWidth + grid / 4 + 3, yOffset + grid / 4 + grid - 1 + barHeight, barWidth, 1, bevelColor) // mp b
+						const hpWidth = parseInt(barWidth * (partyMember.hp / partyMember.hpMax)),
+							hpOffset = chromeHeight + grid / 4 + 3 + grid + 2,
+							hpString = partyMember.hp < 10 ? '0' + String(partyMember.hp) : String(partyMember.hp);
+						drawRect(chromeHeight + 5, barOffset, barWidth + 2, barHeight, colorsNewer[0]); // hp bg
+						drawRect(chromeHeight + 6, barOffset + 1, hpWidth, barHeight - 2, colorsNewer[11]); // hp in
+						drawRect(chromeHeight + 6, barOffset + 1, hpWidth, 1, colorsNewer[10]); // hp in bev
+						drawRect(chromeHeight + 5, barOffset + barHeight, barWidth + 2, 1, bevelColor); // hp bev
+						drawString('HP', chromeHeight + 5 + 3, barOffset + 3);
+						drawString(hpString, chromeHeight + 5 + barWidth - grid / 2 - 2, barOffset + 3);
+
+						const mpWidth = parseInt(barWidth * (partyMember.mp / partyMember.mpMax)),
+							mpOffset = gameWidth - grid * 5 + 2,
+							mpString = partyMember.mp < 10 ? '0' + String(partyMember.mp) : String(partyMember.mp);
+
+						drawRect(mpOffset, barOffset, barWidth + 2, barHeight, colorsNewer[0]); // mp bg
+						drawRect(mpOffset + 1, barOffset + 1, mpWidth, barHeight - 2, colorsNewer[15]); // mp in
+						drawRect(mpOffset + 1, barOffset + 1, mpWidth, 1, colorsNewer[9]); // mp in bev
+						drawRect(mpOffset, barOffset + barHeight, barWidth + 2, 1, bevelColor); // mp bev
+						drawString('MP', mpOffset + 3, barOffset + 3);
+						drawString(mpString, mpOffset + barWidth - grid / 2 - 2, barOffset + 3);
+
 					});
 				};
 
