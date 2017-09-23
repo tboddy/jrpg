@@ -8,16 +8,16 @@
  if(typeof module === 'object' && module && module.exports) {
   module.exports = data;
  }})("map",
-{ "height":21,
+{ "height":12,
  "layers":[
         {
-         "data":[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 4, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 2, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-         "height":21,
+         "data":[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 1, 1, 2, 2, 1, 1, 2, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 2, 2, 2, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 2, 1, 2, 1, 2, 2, 1, 2, 1, 1, 1, 1, 2, 2, 2, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+         "height":12,
          "name":"Tile Layer 1",
          "opacity":1,
          "type":"tilelayer",
          "visible":true,
-         "width":21,
+         "width":12,
          "x":0,
          "y":0
         }],
@@ -34,7 +34,7 @@
  "tilewidth":16,
  "type":"map",
  "version":1,
- "width":21
+ "width":12
 });
 const enemyArcherImg = new Image(), enemyZombieImg = new Image();
 enemyArcherImg.src = 'img/enemy-bowman.png';
@@ -599,7 +599,7 @@ gameLoop = () => {
 const partyData = [
 
 	{
-		name: 'Stiff and Cold Dookie Crumb',
+		name: 'Dookie Crumb',
 		active: true,
 		hp: 10,
 		hpMax: 14,
@@ -618,7 +618,7 @@ const partyData = [
 	},
 
 	{
-		name: 'Meaty Leaking Sock',
+		name: 'Meaty Sock',
 		active: false,
 		hp: 4,
 		hpMax: 12,
@@ -629,7 +629,7 @@ const partyData = [
 	},
 
 	{
-		name: 'Diarrhea Banana Vitamin',
+		name: 'Diarrhea Banana',
 		active: false,
 		hp: 7,
 		hpMax: 14,
@@ -650,18 +650,21 @@ const inventoryData = [
 	}
 
 ];
-const position = {x: 13, y: 3},
+const position = {x: 3, y: 3},
 	lastPosition = {x: false, y: false},
 	direction = {x: 0.5, y: 0.0},
-	plane = {x: 0, y: 1},
-	rayHeight = gameHeight - grid * 6,
+	plane = {x: 0, y: 0.76},
+	rayHeight = gameHeight - grid * 3,
 	rayWidth = gameWidth,
-	foundTiles = [];
+	foundTiles = [],
+	mapTileSize = 12;
 
 const chimeraImage = new Image(),
-	knightImage = new Image();
+	knightImage = new Image(),
+	minimapBackImage = new Image();
 chimeraImage.src = 'img/chimera.png';
 knightImage.src = 'img/knight.png';
+minimapBackImage.src = 'img/minimapback.png';
 
 let map = [], currentTileMap = TileMaps.map, texture = [];
 
@@ -681,7 +684,7 @@ const dungeon = {
 		texture = getTextures();
 		const parseMap = () => {
 			currentTileMap.layers[0].data.forEach((cell, i) => {
-				if(i % 21 == 0) map.push([]);
+				if(i % mapTileSize == 0) map.push([]);
 				cell = String(cell);
 				map[map.length - 1].push(cell);
 			});
@@ -951,32 +954,100 @@ const dungeon = {
 
 			chrome = () => {
 
-				const bgColor = colorsNewer[3], bevelColor = colorsNewer[4], chromeHeight = gameHeight - rayHeight;
+				const bgColor = colorsNewer[3], borderColor = colorsNewer[0], bevelColor = colorsNewer[4], chromeHeight = gameHeight - rayHeight, padding = 4;
 
-				const background = () => {
-					drawRect(0, rayHeight + 1, gameWidth, gameHeight - rayHeight - 1, bgColor); // bg
-					drawRect(0, rayHeight + 1, gameWidth, 1, bevelColor); // bevel
-					drawRect(chromeHeight, rayHeight, 1, chromeHeight, colorsNewer[0]) // divider
+				const info = () => {
+					const xOffset = 2; yOffset = rayHeight - grid - 2
+					drawRect(xOffset, yOffset, gameWidth - 4, grid, colorsNewer[0]);
+					drawRect(xOffset + 1, yOffset + 1, gameWidth - 6, grid - 2, bgColor);
+					drawRect(xOffset + 1, yOffset + 1, gameWidth - 6, 1, bevelColor);
+					drawString('Share My Life...', xOffset + 1 + padding, yOffset + 1 + 3);
 				},
 
 				minimap = () => {
-					const mapSize = gameHeight - rayHeight - 1 - grid / 2, mapY = rayHeight + 1 + grid / 4, mapX = grid / 4,
-					mapPos = {x: parseInt(position.x), y: parseInt(position.y)};
+					const mapSize = grid * 3.5, mapX = 5, mapY = 5, mapPos = {x: parseInt(position.x), y: parseInt(position.y)};
 					const frame = () => {
-						drawRect(mapX, mapY, mapSize + 1, mapSize + 1, colorsNewer[0]); // bg border
-						drawRect(mapX + 1, mapY + 1, mapSize - 1, mapSize - 1, colorsNewer[1]); // bg
-						drawRect(mapX, mapY + mapSize + 1, mapSize + 1, 1, bevelColor);
+						drawRect(4, 4, mapSize, 1, borderColor); // top
+						drawRect(6, 6, mapSize - 4, 1, borderColor);
+						drawRect(5, 5, mapSize - 2, 1, bgColor);
+
+						drawRect(4, mapSize + 3, mapSize, 1, borderColor); // bottom
+						drawRect(6, mapSize + 1, mapSize - 4, 1, borderColor);
+						drawRect(5, mapSize + 2, mapSize - 2, 1, bgColor);
+
+						drawRect(4, 5, 1, mapSize - 2, borderColor); // left
+						drawRect(6, 7, 1, mapSize - 6, borderColor);
+						drawRect(5, 6, 1, mapSize - 4, bgColor);
+
+						drawRect(mapSize + 3, 5, 1, mapSize - 2, borderColor); // right
+						drawRect(mapSize + 1, 7, 1, mapSize - 6, borderColor);
+						drawRect(mapSize + 2, 6, 1, mapSize - 4, bgColor);
+
+						context.fillStyle = context.createPattern(minimapBackImage, 'repeat'); // bg
+						context.fillRect(7, 7, mapSize - 6, mapSize - 6);
+
+						// drawRect(4, 4, mapSize, mapSize, colorsNewer[0]);
+
+						// drawRect(5, 5, mapSize - 2, mapSize - 2, bgColor);
+
+						// drawRect(7, 7, mapSize - 6, mapSize - 6, colorsNewer[0]);
+
+						// drawRect(5, 5, mapSize - 2, 1, bevelColor);
+						// drawRect(7, mapSize + 1, mapSize - 6, 1, bevelColor);
+
+
 					}, tiles = () => {
 						const bgColor = colorsNewer[1], gridColor = colorsNewer[3], activeColor = colorsNewer[15], doorColor = colorsNewer[14];
+						let activeCount = 0;
 						map.forEach((row, y) => {
 							row.forEach((grid, x) => {
-								const xOffset = 2 * (x + 1), yOffset = 2 * (y + 1);
+								const xOffset = 2 * (x + 1) + 1, yOffset = 2 * (y + 1) + 1;
 								if(acceptedTiles.indexOf(grid) > -1){
 									if((x == mapPos.x && y == mapPos.y) ||
 										(x + 1 == mapPos.x && y == mapPos.y) ||
 										(x == mapPos.x && y + 1 == mapPos.y) ||
 										(x + 1 == mapPos.x && y + 1 == mapPos.y)){
-										drawRect(mapX + xOffset, mapY + yOffset, 2, 2, activeColor);
+
+										const tempDirection = {
+											x: parseInt(direction.x * 10),
+											y: parseInt(direction.y * 10)
+										}
+
+										if(gameClock ==120) console.log(tempDirection)
+
+										if(activeCount == 0) drawRect(mapX + xOffset, mapY + yOffset, 4, 4, gridColor);
+
+										if(tempDirection.x == 5){ // east
+											switch(activeCount){
+												case 0: drawRect(mapX + xOffset, mapY + yOffset, 3, 4, activeColor); break;
+												case 1: drawRect(mapX + xOffset + 1, mapY + yOffset + 1, 1, 2, activeColor); break;
+											}
+										} else if(tempDirection.x == -5){ // west
+											switch(activeCount){
+												case 0: drawRect(mapX + xOffset, mapY + yOffset + 1, 1, 2, activeColor); break;
+												case 1: drawRect(mapX + xOffset - 1, mapY + yOffset, 3, 4, activeColor); break;
+											}
+										} else if(tempDirection.y == 5){ // south
+											switch(activeCount){
+												case 0: drawRect(mapX + xOffset, mapY + yOffset, 4, 3, activeColor); break;
+												case 1: drawRect(mapX + xOffset - 1, mapY + yOffset + 3, 2, 1, activeColor); break;
+											}
+										} else if(tempDirection.y == -5){ // north
+											switch(activeCount){
+												case 0: drawRect(mapX + xOffset, mapY + yOffset + 1, 4, 3, activeColor); break;
+												case 1: drawRect(mapX + xOffset - 1, mapY + yOffset, 2, 1, activeColor); break;
+											}
+										} else {
+											switch(activeCount){
+												case 0: drawRect(mapX + xOffset, mapY + yOffset + 1, 1, 2, activeColor); break;
+												case 1: drawRect(mapX + xOffset - 1, mapY + yOffset, 2, 4, activeColor); break;
+												case 2: drawRect(mapX + xOffset + 3, mapY + yOffset - 1, 1, 2, activeColor); break;
+											}
+										}
+
+										activeCount++;
+
+
 										const pushTiles = () => {
 											foundTiles.push({x: x, y: y});
 										};
@@ -1003,47 +1074,45 @@ const dungeon = {
 				},
 
 				party = () => {
+					drawRect(0, rayHeight + 1, gameWidth, gameHeight - rayHeight - 1, bgColor); // bg
+					drawRect(0, rayHeight + 1, gameWidth, 1, bevelColor); // bg
 					partyData.forEach((partyMember, i) => {
-						const yOffset = rayHeight + ((chromeHeight / 3) * i);
-						if(i > 0){
-							drawRect(chromeHeight + 1, yOffset, gameWidth - chromeHeight - 1, 1, colorsNewer[0]);
-							drawRect(chromeHeight + 1, yOffset + 1, gameWidth - chromeHeight - 1, 1, bevelColor);
-						}
+						let width = (grid * 5.25) + 1;
+						const barHeight = grid / 2 + 5;
+						let xOffset = width * i + 1, yOffset = rayHeight + 1;
+						if(i == 1) width = width - 1;
+						const barWidth = width - padding - 2 - grid;
+						if(i > 0) drawRect(xOffset - 1, yOffset, 1, chromeHeight, colorsNewer[0]);
+						if(i == 0) xOffset -= 1;
 
-						const nameOffset = yOffset + 1 + 4;
-						drawString(partyMember.name, chromeHeight + 1 + 4, nameOffset); // name
+						drawString(partyMember.name, xOffset + padding, yOffset + padding); // name
 
-						const barWidth = grid * 4.5,
-							barHeight = grid / 2 + 5,
-							barOffset = yOffset + (grid * 1.5) - (grid / 2);
-
-						const hpWidth = parseInt(barWidth * (partyMember.hp / partyMember.hpMax)),
-							hpOffset = chromeHeight + grid / 4 + 3 + grid + 2,
+						const hpOffset = yOffset + grid - 1,
+							hpWidth = parseInt(barWidth * (partyMember.hp / partyMember.hpMax)),
 							hpString = partyMember.hp < 10 ? '0' + String(partyMember.hp) : String(partyMember.hp);
-						drawRect(chromeHeight + 5, barOffset, barWidth + 2, barHeight, colorsNewer[0]); // hp bg
-						drawRect(chromeHeight + 6, barOffset + 1, hpWidth, barHeight - 2, colorsNewer[11]); // hp in
-						drawRect(chromeHeight + 6, barOffset + 1, hpWidth, 1, colorsNewer[10]); // hp in bev
-						drawRect(chromeHeight + 5, barOffset + barHeight, barWidth + 2, 1, bevelColor); // hp bev
-						drawString('HP', chromeHeight + 5 + 3, barOffset + 3);
-						drawString(hpString, chromeHeight + 5 + barWidth - grid / 2 - 2, barOffset + 3);
+						drawRect(xOffset + grid, hpOffset, barWidth + 2, barHeight, colorsNewer[0]); // hp bg
+						drawRect(xOffset + grid + 1, hpOffset + 1, hpWidth, barHeight - 2, colorsNewer[11]); // hp in
+						drawRect(xOffset + grid + 1, hpOffset + 1, hpWidth, 1, colorsNewer[10]); // hp bev in
+						drawRect(xOffset + grid, hpOffset + barHeight, barWidth + 2, 1, bevelColor); // hp bev
+						drawString('HP', xOffset + padding, hpOffset + 3);
+						drawString(hpString, xOffset + 3 + grid, hpOffset + 3);
 
-						const mpWidth = parseInt(barWidth * (partyMember.mp / partyMember.mpMax)),
-							mpOffset = gameWidth - grid * 5 + 2,
+						const mpOffset = yOffset + grid + barHeight + 1,
+							mpWidth = parseInt(barWidth * (partyMember.mp / partyMember.mpMax)),
 							mpString = partyMember.mp < 10 ? '0' + String(partyMember.mp) : String(partyMember.mp);
-
-						drawRect(mpOffset, barOffset, barWidth + 2, barHeight, colorsNewer[0]); // mp bg
-						drawRect(mpOffset + 1, barOffset + 1, mpWidth, barHeight - 2, colorsNewer[15]); // mp in
-						drawRect(mpOffset + 1, barOffset + 1, mpWidth, 1, colorsNewer[9]); // mp in bev
-						drawRect(mpOffset, barOffset + barHeight, barWidth + 2, 1, bevelColor); // mp bev
-						drawString('MP', mpOffset + 3, barOffset + 3);
-						drawString(mpString, mpOffset + barWidth - grid / 2 - 2, barOffset + 3);
+						drawRect(xOffset + grid, mpOffset, barWidth + 2, barHeight, colorsNewer[0]); // mp bg
+						drawRect(xOffset + grid + 1, mpOffset + 1, mpWidth, barHeight - 2, colorsNewer[15]); // mp in
+						drawRect(xOffset + grid + 1, mpOffset + 1, mpWidth, 1, colorsNewer[9]); // hp bev in
+						drawRect(xOffset + grid, mpOffset + barHeight, barWidth + 2, 1, bevelColor); // mp bev
+						drawString('MP', xOffset + padding, mpOffset + 3);
+						drawString(mpString, xOffset + 3 + grid, mpOffset + 3);
 
 					});
 				};
 
-				background();
-				minimap();
+				// info();
 				party();
+				minimap();
 
 			},
 

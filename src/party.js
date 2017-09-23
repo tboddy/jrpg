@@ -1,7 +1,7 @@
 const partyData = [
 
 	{
-		name: 'Stiff and Cold Dookie Crumb',
+		name: 'Dookie Crumb',
 		active: true,
 		hp: 10,
 		hpMax: 14,
@@ -20,7 +20,7 @@ const partyData = [
 	},
 
 	{
-		name: 'Meaty Leaking Sock',
+		name: 'Meaty Sock',
 		active: false,
 		hp: 4,
 		hpMax: 12,
@@ -31,7 +31,7 @@ const partyData = [
 	},
 
 	{
-		name: 'Diarrhea Banana Vitamin',
+		name: 'Diarrhea Banana',
 		active: false,
 		hp: 7,
 		hpMax: 14,
