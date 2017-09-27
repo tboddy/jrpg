@@ -11,7 +11,7 @@
 { "height":12,
  "layers":[
         {
-         "data":[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 1, 1, 2, 1, 1, 1, 2, 1, 2, 1, 1, 2, 1, 1, 5, 1, 1, 1, 2, 1, 1, 1, 1, 2, 5, 2, 2, 2, 5, 2, 2, 1, 2, 1, 1, 2, 1, 2, 2, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 1, 1, 5, 1, 1, 2, 2, 2, 1, 1, 2, 1, 2, 1, 2, 2, 1, 2, 1, 1, 1, 1, 2, 2, 2, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 1, 1, 2, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+         "data":[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 1, 1, 2, 1, 1, 1, 2, 1, 2, 1, 1, 2, 1, 1, 5, 1, 1, 1, 2, 1, 1, 1, 1, 2, 5, 2, 2, 2, 5, 2, 2, 1, 2, 1, 1, 2, 1, 2, 2, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 1, 1, 5, 1, 1, 2, 2, 2, 1, 1, 2, 1, 2, 1, 2, 2, 1, 2, 1, 1, 1, 1, 2, 2, 2, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 1, 1, 2, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
          "height":12,
          "name":"Tile Layer 1",
          "opacity":1,
@@ -738,10 +738,10 @@ const inventoryData = [
 	}
 
 ];
-const position = {x: 9, y: 9},
+const position = {x: 3, y: 3},
 	lastPosition = {x: false, y: false},
 	direction = {x: 0.5, y: 0.0},
-	plane = {x: 0, y: 0.86},
+	plane = {x: 0, y: 0.78},
 	rayHeight = gameHeight - grid * 3,
 	rayWidth = gameWidth,
 	foundTiles = [],
@@ -764,7 +764,7 @@ const moveTime = 32, acceptedTiles = ['.', '2', '3'],
 const rotateSpeed = (Math.PI / moveTime) / 2, randomEncounterSteps = 10;
 
 let turnRightTimer = moveTime, turnLeftTimer = moveTime, moveTimer = moveTime + 1, turnAroundTimer = moveTime * 2, canMove = true, currentSteps = 0,
-	inBattle = false, spriteShowing = false, currentSprite, doingAction = false, atDoor = false;
+	inBattle = false, spriteShowing = false, currentSprite, doingAction = false, atDoor = false, atTalk = false;
 
 const dungeon = {
 
@@ -1004,36 +1004,17 @@ const dungeon = {
 
 						// draw action prompt
 						if(currentSprite.action){
-
 							const drawActionBox = string => {
-								const boxWidth = grid * 3, boxHeight = grid * 1.5;
-								const xOffset = gameWidth / 2 - boxWidth / 2, yOffset = grid * 0.5;
-								drawRect(xOffset, yOffset, boxWidth, boxHeight, colorsNewer[0]); // border
-								drawRect(xOffset + 1, yOffset + 1, boxWidth - 2, boxHeight - 2, colorsNewer[3]); // bg
-								drawRect(xOffset + 1, yOffset + 1, boxWidth - 2, 1, colorsNewer[4]); // bevel
-								drawString(string, xOffset + grid / 2, yOffset + grid / 2); // string
+								const x = gameWidth / 2 - grid / 2, y = grid;
+								drawString(string, x, y + 4, true);
 							};
-
 							switch(currentSprite.action){
 								case 'talk':
-
 									drawActionBox('Talk');
-
-									// boxWidth = gameWidth - grid / 2;
-									// boxHeight = grid * 3.25;
-									// xOffset = grid / 4;
-									// yOffset = grid * 4.5;
-									// drawRect(xOffset, yOffset, boxWidth, boxHeight, colorsNewer[0]); // border
-									// drawRect(xOffset + 1, yOffset + 1, boxWidth - 2, boxHeight - 2, colorsNewer[3]); // bg
-									// drawRect(xOffset + 1, yOffset + 1, boxWidth - 2, 1, colorsNewer[4]); // bevel
-									// drawString('general moisty:', xOffset + grid / 2, yOffset + grid / 2); // string
-									// drawString('i have lost my beef coith.', xOffset + grid / 2, yOffset + grid / 2 + grid); // string
-									// drawString('can you reclaim my coith ...', xOffset + grid / 2, yOffset + grid / 2 + grid * 1.75); // string
-
+									atTalk = true;
 									break;
 							}
 						}
-
 					}
 				};
 
@@ -1053,8 +1034,8 @@ const dungeon = {
 					padding = 4;
 
 				const info = () => {
-					const xOffset = 2; yOffset = rayHeight - grid - 2
-					drawRect(xOffset, yOffset, gameWidth - 4, grid, colorsNewer[0]);
+					const xOffset = 2; yOffset = rayHeight - grid - 2;
+					drawRect(xOffset, yOffset, gameWidth - 4, grid, borderColor);
 					drawRect(xOffset + 1, yOffset + 1, gameWidth - 6, grid - 2, bgColor);
 					drawRect(xOffset + 1, yOffset + 1, gameWidth - 6, 1, bevelColor);
 					drawString('Share My Life...', xOffset + 1 + padding, yOffset + 1 + 3);
@@ -1082,7 +1063,7 @@ const dungeon = {
 						context.fillStyle = context.createPattern(minimapBackImage, 'repeat'); // bg
 						context.fillRect(7, 7, mapSize - 6, mapSize - 6);
 					}, tiles = () => {
-						const bgColor = colorsNewer[1], gridColor = colorsNewer[3], activeColor = colorsNewer[15], doorColor = colorsNewer[14];
+						const activeColor = colorsNewest[18];
 						let activeCount = 0, inactiveCount = 0;
 						map.forEach((row, y) => {
 							row.forEach((grid, x) => {
@@ -1092,47 +1073,19 @@ const dungeon = {
 										(x + 1 == mapPos.x && y == mapPos.y) ||
 										(x == mapPos.x && y + 1 == mapPos.y) ||
 										(x + 1 == mapPos.x && y + 1 == mapPos.y)){
-
 										const tempDirection = {
 											x: parseInt(direction.x * 10),
 											y: parseInt(direction.y * 10)
 										}
-
 										if(activeCount == 0){
 											drawRect(mapX + xOffset, mapY + yOffset, 5, 5, borderColor);
 											drawRect(mapX + xOffset + 1, mapY + yOffset + 1, 3, 3, activeColor);
 										}
-
-										// if(tempDirection.x == 5){ // east
 										// 	switch(activeCount){
 										// 		case 0: drawRect(mapX + xOffset + 1, mapY + yOffset + 1, 2, 3, activeColor); break;
 										// 		case 1: drawRect(mapX + xOffset + 1, mapY + yOffset + 2, 1, 1, activeColor); break;
 										// 	}
-										// } else if(tempDirection.x == -5){ // west
-										// 	switch(activeCount){
-										// 		case 0: drawRect(mapX + xOffset + 1, mapY + yOffset + 2, 1, 1, activeColor); break;
-										// 		case 1: drawRect(mapX + xOffset, mapY + yOffset + 1, 2, 3, activeColor); break;
-										// 	}
-										// } else if(tempDirection.y == 5){ // south
-										// 	switch(activeCount){
-										// 		case 0: drawRect(mapX + xOffset + 1, mapY + yOffset + 1, 3, 2, activeColor); break;
-										// 		case 1: drawRect(mapX + xOffset, mapY + yOffset + 3, 1, 1, activeColor); break;
-										// 	}
-										// } else if(tempDirection.y == -5){ // north
-										// 	switch(activeCount){
-										// 		case 0: drawRect(mapX + xOffset + 1, mapY + yOffset + 2, 3, 2, activeColor); break;
-										// 		case 1: drawRect(mapX + xOffset, mapY + yOffset + 1, 1, 1, activeColor); break;
-										// 	}
-										// } else {
-										// 	switch(activeCount){
-										// 		case 0: drawRect(mapX + xOffset + 1, mapY + yOffset + 2, 1, 1, activeColor); break;
-										// 		case 1: drawRect(mapX + xOffset, mapY + yOffset + 1, 1, 3, activeColor); break;
-										// 		case 2: drawRect(mapX + xOffset + 3, mapY + yOffset, 1, 1, activeColor); break;
-										// 	}
-										// }
-
 										activeCount++;
-
 										const pushTiles = () => {
 											foundTiles.push({x: x, y: y});
 										};
@@ -1149,7 +1102,7 @@ const dungeon = {
 												if(tile.y == y && x == tile.x){
 													if(tile.y % 2 == 0 && tile.x % 2 == 0){
 														drawRect(mapX + xOffset, mapY + yOffset, 5, 5, borderColor);
-														drawRect(mapX + xOffset + 1, mapY + yOffset + 1, 3, 3, gridColor);
+														drawRect(mapX + xOffset + 1, mapY + yOffset + 1, 3, 3, bgColor);
 													}
 												}
 											});
@@ -1172,7 +1125,7 @@ const dungeon = {
 						let xOffset = width * i + 1, yOffset = rayHeight + 1;
 						if(i == 1) width = width - 1;
 						const barWidth = width - padding - 2 - grid;
-						if(i > 0) drawRect(xOffset - 1, yOffset, 1, chromeHeight, colorsNewer[0]);
+						if(i > 0) drawRect(xOffset - 1, yOffset, 1, chromeHeight, borderColor);
 						if(i == 0) xOffset -= 1;
 
 						drawString(partyMember.name, xOffset + padding, yOffset + padding); // name
@@ -1180,9 +1133,9 @@ const dungeon = {
 						const hpOffset = yOffset + grid - 1,
 							hpWidth = parseInt(barWidth * (partyMember.hp / partyMember.hpMax)),
 							hpString = partyMember.hp < 10 ? '0' + String(partyMember.hp) : String(partyMember.hp);
-						drawRect(xOffset + grid, hpOffset, barWidth + 2, barHeight, colorsNewer[0]); // hp bg
-						drawRect(xOffset + grid + 1, hpOffset + 1, hpWidth, barHeight - 2, colorsNewer[11]); // hp in
-						drawRect(xOffset + grid + 1, hpOffset + 1, hpWidth, 1, colorsNewer[10]); // hp bev in
+						drawRect(xOffset + grid, hpOffset, barWidth + 2, barHeight, borderColor); // hp bg
+						drawRect(xOffset + grid + 1, hpOffset + 1, hpWidth, barHeight - 2, colorsNewest[27]); // hp in
+						drawRect(xOffset + grid + 1, hpOffset + 1, hpWidth, 1, colorsNewest[28]); // hp bev in
 						drawRect(xOffset + grid, hpOffset + barHeight, barWidth + 2, 1, bevelColor); // hp bev
 						drawString('HP', xOffset + padding, hpOffset + 3);
 						drawString(hpString, xOffset + 3 + grid, hpOffset + 3);
@@ -1190,9 +1143,9 @@ const dungeon = {
 						const mpOffset = yOffset + grid + barHeight + 1,
 							mpWidth = parseInt(barWidth * (partyMember.mp / partyMember.mpMax)),
 							mpString = partyMember.mp < 10 ? '0' + String(partyMember.mp) : String(partyMember.mp);
-						drawRect(xOffset + grid, mpOffset, barWidth + 2, barHeight, colorsNewer[0]); // mp bg
-						drawRect(xOffset + grid + 1, mpOffset + 1, mpWidth, barHeight - 2, colorsNewer[15]); // mp in
-						drawRect(xOffset + grid + 1, mpOffset + 1, mpWidth, 1, colorsNewer[9]); // hp bev in
+						drawRect(xOffset + grid, mpOffset, barWidth + 2, barHeight, borderColor); // mp bg
+						drawRect(xOffset + grid + 1, mpOffset + 1, mpWidth, barHeight - 2, colorsNewest[17]); // mp in
+						drawRect(xOffset + grid + 1, mpOffset + 1, mpWidth, 1, colorsNewest[18]); // hp bev in
 						drawRect(xOffset + grid, mpOffset + barHeight, barWidth + 2, 1, bevelColor); // mp bev
 						drawString('MP', xOffset + padding, mpOffset + 3);
 						drawString(mpString, xOffset + 3 + grid, mpOffset + 3);
@@ -1219,7 +1172,7 @@ const dungeon = {
 
 				// info();
 				party();
-				// minimap();
+				minimap();
 				doors();
 
 			},
@@ -1301,19 +1254,26 @@ const dungeon = {
 					map[nextTile().y][nextTile().x] = '2';
 					map[nextTile().y][nextTile().x - 1] = '2';
 					atDoor = false;
+					doingAction = false;
+					canMove = true;
+				},
+
+				startTalk(){
+					console.log('started talking..');
+					// atTalk = false;
 				},
 
 				init(){
 					if(doingAction){
 						let actionType = false;
 						if(atDoor) actionType = 'door';
+						else if(atTalk) actionType = 'talk';
 						if(actionType){
 							switch(actionType){
 								case 'door': actions.openDoor(); break;
+								case 'talk': actions.startTalk(); break;
 							}
 						}
-						doingAction = false;
-						canMove = true;
 					}
 				}
 
