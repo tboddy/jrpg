@@ -1,7 +1,7 @@
-const position = {x: 3, y: 3},
+const position = {x: 9, y: 9},
 	lastPosition = {x: false, y: false},
 	direction = {x: 0.5, y: 0.0},
-	plane = {x: 0, y: 0.76},
+	plane = {x: 0, y: 0.86},
 	rayHeight = gameHeight - grid * 3,
 	rayWidth = gameWidth,
 	foundTiles = [],
@@ -24,7 +24,7 @@ const moveTime = 32, acceptedTiles = ['.', '2', '3'],
 const rotateSpeed = (Math.PI / moveTime) / 2, randomEncounterSteps = 10;
 
 let turnRightTimer = moveTime, turnLeftTimer = moveTime, moveTimer = moveTime + 1, turnAroundTimer = moveTime * 2, canMove = true, currentSteps = 0,
-	inBattle = false, spriteShowing = false, currentSprite;
+	inBattle = false, spriteShowing = false, currentSprite, doingAction = false, atDoor = false;
 
 const dungeon = {
 
@@ -40,7 +40,9 @@ const dungeon = {
 			map.forEach((row, i) => {
 				map[i] = row.reduce((res, current, index, array) => {
 					let nextCurrent = current;
-					if(current == '4') nextCurrent = '$';
+					// switch(current){
+					// 	case '4': nextCurrent = '$'; break;
+					// }
 					return res.concat([current, nextCurrent]);
 				}, []);
 			});
@@ -49,15 +51,15 @@ const dungeon = {
 			}, []);
 		}, controls = () => {
 			const keysDown = e => {
-				if(canMove){
+				const activeKeys = [38, 37, 39, 40, 65]
+				if(canMove && activeKeys.indexOf(e.which) > -1){
 					canMove = false;
 					switch(e.which){
 						case 38: forward(); break;
 						case 37: turnLeft(); break;
 						case 39: turnRight(); break;
 						case 40: turnAround(); break;
-						// case 13: select(); break;
-						// case 8: back(); break;
+						case 65: action(); break;
 					};
 				}
 			}, keysUp = () => {},
@@ -71,6 +73,7 @@ const dungeon = {
 			}, turnAround = () => { turnAroundTimer = 0;
 			}, turnRight = () => { turnRightTimer = 0;
 			}, turnLeft = () => { turnLeftTimer = 0;
+			}, action = () => { doingAction = true;
 			};
 			document.addEventListener('keydown', keysDown);
 			// document.addEventListener('keyup', keysUp);
@@ -148,11 +151,15 @@ const dungeon = {
 						case '1':
 							wallTex = texture[0];
 							break;
-						case '4':
+						// case '4':
+						// 	wallTex = texture[3];
+						// 	break;
+						case '5': // door
 							wallTex = texture[3];
-							break;
-						case '$':
-							wallTex = texture[4];
+							if(map[mapPosition.y + 1][mapPosition.x] == '5' && map[mapPosition.y][mapPosition.x - 1] == '2') wallTex = texture[4]; // east wall
+							else if(map[mapPosition.y - 1][mapPosition.x] == '5' && map[mapPosition.y][mapPosition.x + 1] == '2') wallTex = texture[4]; // west wall
+							else if(map[mapPosition.y][mapPosition.x + 1] == '5' && map[mapPosition.y + 1][mapPosition.x] == '2') wallTex = texture[4]; // north wall
+							else if(map[mapPosition.y][mapPosition.x - 1] == '5' && map[mapPosition.y - 1][mapPosition.x] == '2') wallTex = texture[4]; // south wall
 							break;
 					}
 
@@ -302,7 +309,8 @@ const dungeon = {
 
 			chrome = () => {
 
-				const bgColor = colorsNewer[3], borderColor = colorsNewer[0], bevelColor = colorsNewer[4], chromeHeight = gameHeight - rayHeight, padding = 4;
+				const bgColor = colorsNewest[25], borderColor = colorsNewest[0], bevelColor = colorsNewest[24], chromeHeight = gameHeight - rayHeight,
+					padding = 4;
 
 				const info = () => {
 					const xOffset = 2; yOffset = rayHeight - grid - 2
@@ -333,20 +341,9 @@ const dungeon = {
 
 						context.fillStyle = context.createPattern(minimapBackImage, 'repeat'); // bg
 						context.fillRect(7, 7, mapSize - 6, mapSize - 6);
-
-						// drawRect(4, 4, mapSize, mapSize, colorsNewer[0]);
-
-						// drawRect(5, 5, mapSize - 2, mapSize - 2, bgColor);
-
-						// drawRect(7, 7, mapSize - 6, mapSize - 6, colorsNewer[0]);
-
-						// drawRect(5, 5, mapSize - 2, 1, bevelColor);
-						// drawRect(7, mapSize + 1, mapSize - 6, 1, bevelColor);
-
-
 					}, tiles = () => {
 						const bgColor = colorsNewer[1], gridColor = colorsNewer[3], activeColor = colorsNewer[15], doorColor = colorsNewer[14];
-						let activeCount = 0;
+						let activeCount = 0, inactiveCount = 0;
 						map.forEach((row, y) => {
 							row.forEach((grid, x) => {
 								const xOffset = 2 * (x + 1) + 1, yOffset = 2 * (y + 1) + 1;
@@ -361,40 +358,40 @@ const dungeon = {
 											y: parseInt(direction.y * 10)
 										}
 
-										if(gameClock ==120) console.log(tempDirection)
-
-										if(activeCount == 0) drawRect(mapX + xOffset, mapY + yOffset, 4, 4, gridColor);
-
-										if(tempDirection.x == 5){ // east
-											switch(activeCount){
-												case 0: drawRect(mapX + xOffset, mapY + yOffset, 3, 4, activeColor); break;
-												case 1: drawRect(mapX + xOffset + 1, mapY + yOffset + 1, 1, 2, activeColor); break;
-											}
-										} else if(tempDirection.x == -5){ // west
-											switch(activeCount){
-												case 0: drawRect(mapX + xOffset, mapY + yOffset + 1, 1, 2, activeColor); break;
-												case 1: drawRect(mapX + xOffset - 1, mapY + yOffset, 3, 4, activeColor); break;
-											}
-										} else if(tempDirection.y == 5){ // south
-											switch(activeCount){
-												case 0: drawRect(mapX + xOffset, mapY + yOffset, 4, 3, activeColor); break;
-												case 1: drawRect(mapX + xOffset - 1, mapY + yOffset + 3, 2, 1, activeColor); break;
-											}
-										} else if(tempDirection.y == -5){ // north
-											switch(activeCount){
-												case 0: drawRect(mapX + xOffset, mapY + yOffset + 1, 4, 3, activeColor); break;
-												case 1: drawRect(mapX + xOffset - 1, mapY + yOffset, 2, 1, activeColor); break;
-											}
-										} else {
-											switch(activeCount){
-												case 0: drawRect(mapX + xOffset, mapY + yOffset + 1, 1, 2, activeColor); break;
-												case 1: drawRect(mapX + xOffset - 1, mapY + yOffset, 2, 4, activeColor); break;
-												case 2: drawRect(mapX + xOffset + 3, mapY + yOffset - 1, 1, 2, activeColor); break;
-											}
+										if(activeCount == 0){
+											drawRect(mapX + xOffset, mapY + yOffset, 5, 5, borderColor);
+											drawRect(mapX + xOffset + 1, mapY + yOffset + 1, 3, 3, activeColor);
 										}
 
-										activeCount++;
+										// if(tempDirection.x == 5){ // east
+										// 	switch(activeCount){
+										// 		case 0: drawRect(mapX + xOffset + 1, mapY + yOffset + 1, 2, 3, activeColor); break;
+										// 		case 1: drawRect(mapX + xOffset + 1, mapY + yOffset + 2, 1, 1, activeColor); break;
+										// 	}
+										// } else if(tempDirection.x == -5){ // west
+										// 	switch(activeCount){
+										// 		case 0: drawRect(mapX + xOffset + 1, mapY + yOffset + 2, 1, 1, activeColor); break;
+										// 		case 1: drawRect(mapX + xOffset, mapY + yOffset + 1, 2, 3, activeColor); break;
+										// 	}
+										// } else if(tempDirection.y == 5){ // south
+										// 	switch(activeCount){
+										// 		case 0: drawRect(mapX + xOffset + 1, mapY + yOffset + 1, 3, 2, activeColor); break;
+										// 		case 1: drawRect(mapX + xOffset, mapY + yOffset + 3, 1, 1, activeColor); break;
+										// 	}
+										// } else if(tempDirection.y == -5){ // north
+										// 	switch(activeCount){
+										// 		case 0: drawRect(mapX + xOffset + 1, mapY + yOffset + 2, 3, 2, activeColor); break;
+										// 		case 1: drawRect(mapX + xOffset, mapY + yOffset + 1, 1, 1, activeColor); break;
+										// 	}
+										// } else {
+										// 	switch(activeCount){
+										// 		case 0: drawRect(mapX + xOffset + 1, mapY + yOffset + 2, 1, 1, activeColor); break;
+										// 		case 1: drawRect(mapX + xOffset, mapY + yOffset + 1, 1, 3, activeColor); break;
+										// 		case 2: drawRect(mapX + xOffset + 3, mapY + yOffset, 1, 1, activeColor); break;
+										// 	}
+										// }
 
+										activeCount++;
 
 										const pushTiles = () => {
 											foundTiles.push({x: x, y: y});
@@ -409,7 +406,12 @@ const dungeon = {
 									} else {
 										if(foundTiles.length){
 											foundTiles.forEach(tile => {
-												if(tile.y == y && x == tile.x) drawRect(mapX + xOffset, mapY + yOffset, 2, 2, gridColor);
+												if(tile.y == y && x == tile.x){
+													if(tile.y % 2 == 0 && tile.x % 2 == 0){
+														drawRect(mapX + xOffset, mapY + yOffset, 5, 5, borderColor);
+														drawRect(mapX + xOffset + 1, mapY + yOffset + 1, 3, 3, gridColor);
+													}
+												}
 											});
 										}
 									}
@@ -456,15 +458,33 @@ const dungeon = {
 						drawString(mpString, xOffset + 3 + grid, mpOffset + 3);
 
 					});
+				},
+
+				doors = () => {
+					const tempDirection = {
+						x: parseInt(direction.x * 10),
+						y: parseInt(direction.y * 10)
+					}, drawDoor = () => {
+						const x = gameWidth / 2 - grid / 2, y = grid;
+						drawString('Open', x, y + 4, true);
+						atDoor = true;
+					};
+					if(map[nextTile().y] && (map[nextTile().y][nextTile().x] == '5') &&
+						turnRightTimer >= moveTime &&
+						turnLeftTimer >= moveTime &&
+						moveTimer >= moveTime + 1 &&
+						turnAroundTimer >= moveTime) drawDoor();
+					else atDoor = false;
 				};
 
 				// info();
 				party();
-				minimap();
+				// minimap();
+				doors();
 
 			},
 
-			controlAnimations = {
+			raycastMoveAnimations = {
 
 				moveForward(){
 					if(moveTimer < moveTime){
@@ -527,17 +547,43 @@ const dungeon = {
 				},
 
 				init(){
-					controlAnimations.moveForward();
-					controlAnimations.turnRight();
-					controlAnimations.turnLeft();
-					controlAnimations.turnAround();
+					raycastMoveAnimations.moveForward();
+					raycastMoveAnimations.turnRight();
+					raycastMoveAnimations.turnLeft();
+					raycastMoveAnimations.turnAround();
 				}
 
-			};
+			},
+
+			actions = {
+
+				openDoor(){
+					map[nextTile().y][nextTile().x] = '2';
+					map[nextTile().y][nextTile().x - 1] = '2';
+					atDoor = false;
+				},
+
+				init(){
+					if(doingAction){
+						let actionType = false;
+						if(atDoor) actionType = 'door';
+						if(actionType){
+							switch(actionType){
+								case 'door': actions.openDoor(); break;
+							}
+						}
+						doingAction = false;
+						canMove = true;
+					}
+				}
+
+			}
+			//doingAction
 
 			raycast();
 			chrome();
-			controlAnimations.init();
+			raycastMoveAnimations.init();
+			actions.init();
 
 		};
 

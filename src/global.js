@@ -64,6 +64,44 @@ colorsNewer = [
 	'#516cbf'
 ],
 
+colorsNewest = [
+	'#000000',
+	'#222034',
+	'#45283c',
+	'#663931',
+	'#8f563b',
+	'#df7126',
+	'#d9a066',
+	'#eec39a',
+
+	'#fbf236',
+	'#99e550',
+	'#6abe30',
+	'#37946e',
+	'#4b692f',
+	'#524b24',
+	'#323c39',
+	'#3f3f74',
+
+	'#306082',
+	'#5b6ee1',
+	'#639bff',
+	'#5fcde4',
+	'#cbdbfc',
+	'#ffffff',
+	'#9badb7',
+	'#847e87',
+
+	'#696a6a',
+	'#595652',
+	'#76428a',
+	'#ac3232',
+	'#d95763',
+	'#d77bba',
+	'#8f974a',
+	'#8a6f30'
+];
+
 jrpg = {},
 
 circle = Math.PI * 2,
@@ -85,8 +123,21 @@ drawRect = (x, y, width, height, color) => {
 	context.fill();
 },
 
-drawString = (input, x, y) => {
-	let lastX = 0, lastWidth = 0;
+drawString = (input, x, y, hasFloatingChrome) => {
+	let lastX = 0, lastWidth = 0, totalWidth = 0;
+	const stringTempArray = [], drawFloatingChrome = () => {
+		let width = totalWidth - 1, chromeX = gameWidth / 2 - grid / 2;
+		width += 8;
+		chromeX -= 4;
+		const height = grid,
+			chromeY = grid,
+			borderColor = colorsNewest[0],
+			backgroundColor = colorsNewest[25],
+			bevelColor = colorsNewest[24];
+		drawRect(chromeX - 1, chromeY - 1, width + 2, height + 2, borderColor);
+		drawRect(chromeX, chromeY + 1, width, height - 1, backgroundColor);
+		drawRect(chromeX, chromeY, width, 1, bevelColor);
+	};
 	input.split('').forEach((char, i) => {
 		let charX = 0, charY = 0, charWidth = 0, charHeight = 8;
 		switch(char){
@@ -445,7 +496,13 @@ drawString = (input, x, y) => {
 		if(!lastX) lastX = x;
 		if(lastWidth) lastX = lastX + lastWidth;
 		lastWidth = charWidth;
-		context.drawImage(fontImage, charX, charY, charWidth, charHeight, lastX, y, charWidth, charHeight);
+		totalWidth += charWidth;
+		stringTempArray.push([fontImage, charX, charY, charWidth, charHeight, lastX, y, charWidth, charHeight]);
+	});
+	// if(gameClock < 1) console.log(totalWidth)
+	if(hasFloatingChrome) drawFloatingChrome();
+	stringTempArray.forEach(char => {
+		context.drawImage(char[0], char[1], char[2], char[3], char[4], char[5], char[6], char[7], char[8]);
 	});
 };
 
@@ -459,4 +516,35 @@ getAspect = () => {
 
 isMinusZero = value => {
 	return 1 / value === -Infinity;
+},
+
+currentCardinal = () => {
+	const tempDirection = {
+		x: parseInt(direction.x * 10),
+		y: parseInt(direction.y * 10)
+	};
+	if(tempDirection.x == 5) return 'east';
+	else if(tempDirection.x == -5) return 'west';
+	else if(tempDirection.y == 5) return 'south';
+	else if(tempDirection.y == -5) return 'north';
+},
+
+nextTile = () => {
+	const nextPos = position;
+	let nextX = position.x, nextY = position.y;
+	switch(currentCardinal()){
+		case 'east':
+			nextX += 2;
+			break;
+		case 'west':
+			nextX -= 2;
+			break;
+		case 'north':
+			nextY -= 2;
+			break;
+		case 'south':
+			nextY += 2;
+			break;
+	}
+	return {x: nextX, y: nextY}
 };
