@@ -75,6 +75,38 @@ const bestiary = {
 	}
 
 };
+const npcs = {
+
+	coith: {
+		name: 'Commander Coith',
+		dialog: {
+			data: {
+				copy: 'I poop my pants so damn well. I poop them well, so that theymay swell.',
+				choices: {
+					prompt: 'Will you dump my load?',
+					options: [
+						{
+							label: 'yes',
+							result: 0
+						},
+						{
+							label: 'no',
+							result: 1
+						}
+					]
+				}
+			},
+			children: [
+				{
+					data: {
+						copy: 'Great. Take this for being so agreeable.'
+					}
+				}
+			]
+		}
+	}
+
+};
 const fps = 60, canvas = document.getElementById('canvas'), canvasEl = $('canvas'), grid = 16, gameHeight = 224, gameWidth = 256,
 	browserWindow = require('electron').remote, storage = require('electron-json-storage'), analogThresh = 0.15, charImg = new Image(),
 	fontImage = new Image();
@@ -575,8 +607,13 @@ drawString = (input, x, y, hasFloatingChrome) => {
 		lastWidth = charWidth;
 		totalWidth += charWidth;
 		stringTempArray.push([fontImage, charX, charY, charWidth, charHeight, lastX, y, charWidth, charHeight]);
+		if(totalWidth >= gameWidth - grid){
+			totalWidth = 0;
+			lastWidth = 0;
+			y += grid * 0.75;
+			lastX = 0;
+		}
 	});
-	// if(gameClock < 1) console.log(totalWidth)
 	if(hasFloatingChrome) drawFloatingChrome();
 	stringTempArray.forEach(char => {
 		context.drawImage(char[0], char[1], char[2], char[3], char[4], char[5], char[6], char[7], char[8]);
@@ -624,6 +661,13 @@ nextTile = () => {
 			break;
 	}
 	return {x: nextX, y: nextY}
+},
+
+drawBox = (x, y, width, height) => {
+	const bgColor = colorsNewest[25], borderColor = colorsNewest[0], bevelColor = colorsNewest[24];
+	drawRect(x - 1, y - 1, width + 2, height + 2, borderColor);
+	drawRect(x, y + 1, width, height - 1, bgColor);
+	drawRect(x, y, width, 1, bevelColor);
 };
 const images = [], textureSize = grid * 4;
 
@@ -738,7 +782,7 @@ const inventoryData = [
 	}
 
 ];
-const position = {x: 3, y: 3},
+const position = {x: 5, y: 3},
 	lastPosition = {x: false, y: false},
 	direction = {x: 0.5, y: 0.0},
 	plane = {x: 0, y: 0.78},
@@ -758,13 +802,14 @@ let map = [], currentTileMap = TileMaps.map, texture = [];
 
 const moveTime = 32, acceptedTiles = ['.', '2', '3'],
 	spriteTiles = [
-		{tile: 3, image: knightImage, action: 'talk'}
+		{tile: 3, image: knightImage, action: 'talk', npc: 'coith'}
 	];
 
 const rotateSpeed = (Math.PI / moveTime) / 2, randomEncounterSteps = 10;
 
 let turnRightTimer = moveTime, turnLeftTimer = moveTime, moveTimer = moveTime + 1, turnAroundTimer = moveTime * 2, canMove = true, currentSteps = 0,
-	inBattle = false, spriteShowing = false, currentSprite, doingAction = false, atDoor = false, atTalk = false;
+	inBattle = false, spriteShowing = false, currentSprite, doingAction = false, atDoor = false, atTalk = false, logged = false,
+	tempSpriteAction, currentDialogLevel = 0;
 
 const dungeon = {
 
@@ -1259,8 +1304,39 @@ const dungeon = {
 				},
 
 				startTalk(){
-					console.log('started talking..');
+
+					tempSpriteAction = currentSprite.action; // important for re-use
+					currentSprite.action = false;
 					// atTalk = false;
+
+					const npc = npcs[currentSprite.npc];
+					if(!logged){
+						console.log(npc.dialog.data);
+						logged = true;
+					}
+
+					let currentDialog = npc.dialog;
+
+					const boxHeight = grid * 2.5;
+					const boxY = rayHeight - boxHeight - 4, boxX = 4, boxWidth = gameWidth - 8;
+					drawBox(boxX, boxY, boxWidth, boxHeight);
+					drawString(npc.name, boxX + 4, boxY + 4);
+					drawString(currentDialog.data.copy, boxX + 4, boxY + grid);
+
+					// arrow
+					let arrowX = boxX + boxWidth - grid / 2 - 4, arrowY = boxY + boxHeight - grid / 2, arrowSize = grid / 2;
+					const animationCount = 32;
+					if((gameClock % animationCount) < animationCount / 2) arrowY -= 1;
+					drawRect(arrowX, arrowY + 1, grid / 2, 1, 'black');
+					drawRect(arrowX + 1, arrowY + 2, grid / 2 - 2, 1, 'black');
+					drawRect(arrowX + 2, arrowY + 3, grid / 2 - 4, 1, 'black');
+					drawRect(arrowX + 3, arrowY + 4, grid / 2 - 6, 1, 'black');
+					drawRect(arrowX, arrowY, grid / 2, 1, 'white');
+					drawRect(arrowX + 1, arrowY + 1, grid / 2 - 2, 1, 'white');
+					drawRect(arrowX + 2, arrowY + 2, grid / 2 - 4, 1, 'white');
+					drawRect(arrowX + 3, arrowY + 3, grid / 2 - 6, 1, 'white');
+
+					
 				},
 
 				init(){
@@ -1278,7 +1354,6 @@ const dungeon = {
 				}
 
 			}
-			//doingAction
 
 			raycast();
 			chrome();

@@ -5,6 +5,7 @@ module.exports = function(grunt) {
 				src: [
 					'src/map.js',
 					'src/bestiary.js',
+					'src/npcs.js',
 					'src/global.js',
 					'src/game.js',
 					'src/party.js',
