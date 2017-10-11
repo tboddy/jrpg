@@ -519,39 +519,45 @@ const dungeon = {
 					canMove = true;
 				},
 
-				startTalk(){
-
-					tempSpriteAction = currentSprite.action; // important for re-use
-					currentSprite.action = false;
-					// atTalk = false;
+				doTalk(){
 
 					const npc = npcs[currentSprite.npc];
-					if(!logged){
-						console.log(npc.dialog.data);
-						logged = true;
-					}
 
-					let currentDialog = npc.dialog;
+					const dialogStep = () => {
 
-					const boxHeight = grid * 2.5;
-					const boxY = rayHeight - boxHeight - 4, boxX = 4, boxWidth = gameWidth - 8;
-					drawBox(boxX, boxY, boxWidth, boxHeight);
-					drawString(npc.name, boxX + 4, boxY + 4);
-					drawString(currentDialog.data.copy, boxX + 4, boxY + grid);
+						const drawArrow = () => {
+							let arrowX = boxX + boxWidth - grid / 2 - 4, arrowY = boxY + boxHeight - grid / 2, arrowSize = grid / 2;
+							const animationCount = 32;
+							if((gameClock % animationCount) < animationCount / 2) arrowY -= 1;
+							drawRect(arrowX, arrowY + 1, grid / 2, 1, 'black');
+							drawRect(arrowX + 1, arrowY + 2, grid / 2 - 2, 1, 'black');
+							drawRect(arrowX + 2, arrowY + 3, grid / 2 - 4, 1, 'black');
+							drawRect(arrowX + 3, arrowY + 4, grid / 2 - 6, 1, 'black');
+							drawRect(arrowX, arrowY, grid / 2, 1, 'white');
+							drawRect(arrowX + 1, arrowY + 1, grid / 2 - 2, 1, 'white');
+							drawRect(arrowX + 2, arrowY + 2, grid / 2 - 4, 1, 'white');
+							drawRect(arrowX + 3, arrowY + 3, grid / 2 - 6, 1, 'white');
+						};
 
-					// arrow
-					let arrowX = boxX + boxWidth - grid / 2 - 4, arrowY = boxY + boxHeight - grid / 2, arrowSize = grid / 2;
-					const animationCount = 32;
-					if((gameClock % animationCount) < animationCount / 2) arrowY -= 1;
-					drawRect(arrowX, arrowY + 1, grid / 2, 1, 'black');
-					drawRect(arrowX + 1, arrowY + 2, grid / 2 - 2, 1, 'black');
-					drawRect(arrowX + 2, arrowY + 3, grid / 2 - 4, 1, 'black');
-					drawRect(arrowX + 3, arrowY + 4, grid / 2 - 6, 1, 'black');
-					drawRect(arrowX, arrowY, grid / 2, 1, 'white');
-					drawRect(arrowX + 1, arrowY + 1, grid / 2 - 2, 1, 'white');
-					drawRect(arrowX + 2, arrowY + 2, grid / 2 - 4, 1, 'white');
-					drawRect(arrowX + 3, arrowY + 3, grid / 2 - 6, 1, 'white');
+						tempSpriteAction = currentSprite.action; // important for re-use
+						currentSprite.action = false;
+						// atTalk = false;
 
+						if(!logged){
+							console.log(npc.dialog.data);
+							logged = true;
+						}
+
+						let currentDialog = npc.dialog;
+
+						const boxHeight = grid * 2.5;
+						const boxY = rayHeight - boxHeight - 4, boxX = 4, boxWidth = gameWidth - 8;
+						drawBox(boxX, boxY, boxWidth, boxHeight);
+						drawString(npc.name, boxX + 4, boxY + 4);
+						drawString(currentDialog.copy, boxX + 4, boxY + grid);
+						drawArrow();
+
+					};
 					
 				},
 
@@ -563,7 +569,7 @@ const dungeon = {
 						if(actionType){
 							switch(actionType){
 								case 'door': actions.openDoor(); break;
-								case 'talk': actions.startTalk(); break;
+								case 'talk': actions.doTalk(); break;
 							}
 						}
 					}

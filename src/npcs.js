@@ -1,32 +1,22 @@
 const npcs = {
-
 	coith: {
-		name: 'Commander Coith',
+		name: 'Coith',
 		dialog: {
-			data: {
-				copy: 'I poop my pants so damn well. I poop them well, so that theymay swell.',
-				choices: {
-					prompt: 'Will you dump my load?',
-					options: [
-						{
-							label: 'yes',
-							result: 0
-						},
-						{
-							label: 'no',
-							result: 1
-						}
-					]
-				}
-			},
-			children: [
+			copy: 'Greasy goblor has stolen my dump load! Will you help me dump my load?'
+			choices: [
 				{
-					data: {
-						copy: 'Great. Take this for being so agreeable.'
+					label: 'Yes',
+					result: {
+						copy: 'Praise Jebus! You will find the Load Ripper on the third floor.'
+					}
+				},
+				{
+					label: 'No',
+					result: {
+						copy: 'Fine! Just fine! Forget all about my load then.'
 					}
 				}
 			]
 		}
 	}
-
 };
